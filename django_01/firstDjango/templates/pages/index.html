@@ -1,16 +1,13 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'style/style.css' %}">
-</head>
-<body>
-    <h1>index page</h1>
-    <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam assumenda excepturi accusantium, enim debitis quas totam sed voluptatibus consequatur non fugiat illo incidunt qui obcaecati, modi, dolorem vero reiciendis quo!
-    </p>
-</body>
-</html>
+{% extends "layouts/layout.html" %}
+
+{% block title %}
+    Home Page
+{% endblock %}
+
+{% block pageHead %}
+    Welcome to codeMaster
+{% endblock %}
+
+{% block pageBody %}
+    Explore the things at <a href="/">codeMaster</a>
+{% endblock %}
