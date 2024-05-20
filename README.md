@@ -29,8 +29,9 @@ Ensure you have the following installed:
 1. **Clone the repository**:
 
     ```sh
-    git clone https://github.com/your-username/your-django-project.git
-    cd your-django-project
+    git clone https://github.com/azaadmottan/Django.git
+
+    cd django_01
     ```
 
 2. **Create and activate a virtual environment**:
