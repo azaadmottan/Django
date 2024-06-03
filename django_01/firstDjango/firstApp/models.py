@@ -18,63 +18,40 @@ class UserPost (models.Model):
 
     def __str__(self):
         return self.username
-    
-# Foreign key constraints (One to Many relations)
 
-class Author(models.Model):
-    authorName = models.CharField(max_length=255)
+# Foreign key constraints (Many to One relations)
+class Subject(models.Model):
+    subject_name = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.authorName} (Author)"
-
-class Book(models.Model):
-    bookAuthor = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="books")
-    bookTitle = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.bookTitle} (Book)"
-
-# Many to Many relationship
-
-class Student(models.Model):
-    studentName = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.studentName} (Student)"
-    
-class Course(models.Model):
-    courseName = models.CharField(max_length=255)
-    students = models.ManyToManyField(Student, related_name="students")
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.courseName} (Course)"
+        return f"{self.subject_name} (Subject)"
 
 # One to One relationship
-
-class Teacher(models.Model):
-    teacherName = models.CharField(max_length=255)
+class Student(models.Model):
+    student_name = models.CharField(max_length=255)
+    subject_name = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='subjects' , null=True)
+    student_email = models.EmailField(max_length=200)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.teacherName} (Teacher)"
-
-class Subject(models.Model):
-    subjectName = models.CharField(max_length=255)
-    teachers = models.OneToOneField(Teacher, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-    
-    def __str__(self):
-        return f"{self.subjectName} (Subject)"
+        return f"{self.student_name} (Student)"
 
 class Profile(models.Model):
-    studentName = models.CharField(max_length=255)
-    studentAge = models.IntegerField()
-    studentClass = models.CharField(max_length=255)
-    studentSubject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    student_name = models.OneToOneField(Student, on_delete=models.CASCADE, related_name="profile")
+    student_age = models.IntegerField()
+    student_class = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
-    
+
     def __str__(self):
-        return f"{self.studentName} (Profile)"
+        return f"{self.student_name} (Student Profile)"
+
+# Many to Many relationship
+class Teacher(models.Model):
+    teacher_name = models.CharField(max_length=255)
+    teacher_subject = models.ManyToManyField(Subject)
+    teacher_email = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return "{self.teacher_name} (Teacher Name)"
