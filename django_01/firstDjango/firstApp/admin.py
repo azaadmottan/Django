@@ -1,8 +1,10 @@
 from django.contrib import admin
 from .models import UserPost, Student, Profile, Subject, Teacher
-# from .models import UserPost, Author, Book, Student, Course, Teacher, Subject, Profile
 
 # Register your models here.
+
+class UserPostAdmin(admin.ModelAdmin):
+    list_display = ('username', 'title', 'created_at')
 
 class ProfileInline(admin.TabularInline):
     model = Profile
@@ -27,7 +29,7 @@ class TeacherAdmin(admin.ModelAdmin):
     search_fields = ('teacher_name', 'created_at')
     filter_horizontal = ('teacher_subject', )
 
-admin.site.register(UserPost)
+admin.site.register(UserPost, UserPostAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Subject, SubjectAdmin)

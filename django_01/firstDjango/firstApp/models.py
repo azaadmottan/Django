@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from .utils import generate_slug
 
 # Create your models here.
 
@@ -15,9 +16,14 @@ class UserPost (models.Model):
     description = models.TextField(max_length=500, blank=True)
     postPic = models.ImageField(upload_to='postPictures/')
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
-        return self.username
+        return f"{self.username} (User Post)"
+    
+    def save(self, *args, **kwargs):
+        self.slug = generate_slug(self.title)
+        super(UserPost, self).save(*args, **kwargs)
 
 # Foreign key constraints (Many to One relations)
 class Subject(models.Model):

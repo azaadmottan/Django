@@ -11,7 +11,7 @@ def userPosts(request):
 
     return render(request, 'firstApp/userPosts.html', { 'posts': posts })
 
-def previewPost(request, postId):
-    post = get_object_or_404(UserPost, pk=postId)
+def previewPost(request, slug):
+    post = get_object_or_404(UserPost, slug=slug)
 
     return render(request, 'firstApp/previewPost.html', { 'post': post })
