@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up @srisaigroup.in</title>
+    <link rel="shortcut icon" href="{% static "/images/favicon.ico" %}" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <header class="w-full shadow-sm p-3">
+        <figure class="d-flex flex-column gap-3 m-0 p-0 align-items-center justify-content-center">
+            <a href="/" >
+                <img src="{% static "images/logo.gif" %}" alt="SSGI" class="rounded-2 img-fluid">
+            </a>
+            <p class="text-danger fs-3 fw-bold">
+                Sri Sai Group of Institutes of Technology Badhani, Pathankot
+            </p>
+        </figure>
+    </header>
+
+    <div class="bg-body-secondary py-3">
+        <div class="container bg-white border border-2 p-4 rounded-3">
+            <h2 class="mb-4">Sign Up Now as <span id="userType">Mentor</span></h2>
+    
+            <select class="form-select shadow-none my-4" name="selectSignUpType" id="selectSignUpForm" aria-label="Default select example">
+                <option value="">Select Sign Up User Type</option>
+                <option value="mentor">Mentor</option>
+                <option value="mentee">Mentee</option>
+            </select>
+    
+            <form id="mentorRegisterForm" method="POST">
+                <div class="row d-flex flex-column flex-md-row">
+                    <div class="col p-3">
+                        <label for="name" class="form-label fw-medium">Name</label>
+                        <input type="text" value="" name="mentorName" class="form-control border-2 shadow-none" placeholder="Enter your name">
+                        
+                    </div>
+                    <div class="col p-3">
+                        <label for="empId" class="form-label fw-medium">Employee Id</label>
+                        <input type="text" name="empId" class="form-control border-2 shadow-none" placeholder="Enter your employee id" >
+                    </div>
+                </div>
+    
+                <div class="row d-flex flex-column flex-md-row">
+                    <div class="col p-3">
+                        <label for="department" class="form-label fw-medium">Department</label>
+                        <select name="department" name="department" class="form-control border-2 shadow-none pointer" required>
+                            <option value="none" default>Select Department</option>
+                            <option value="CSE">Computer Science &amp; Engg</option>
+                            <option value="ECE">Electrical Communication Engg</option>
+                            <option value="EE">Electrical Engg</option>
+                            <option value="ME">Mechanical Engg</option>
+                            <option value="CE">Civil Engg</option>
+                            <option value="MCA">MCA</option>
+                            <option value="MBA">MBA</option>
+                            <option value="BCA">BCA</option>
+                            <option value="BBA">BBA</option>
+                            <option value="B.Sc(IT)">B.Sc(IT)</option>
+                            <option value="BHMCT">BHMCT</option>
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="row d-flex flex-column flex-md-row">
+                    <div class="col p-3">
+                        <label for="phone" class="form-label fw-medium">Mobile No.</label>
+                        <input type="number" name="mentorPhone" class="form-control border-2 shadow-none" placeholder="Enter your mobile number" >
+                    </div>
+                    <div class="col p-3">
+                        <label for="email" class="form-label fw-medium">Email id</label>
+                        <input type="email" name="mentorEmail" class="form-control border-2 shadow-none" placeholder="Enter your email id" >
+                    </div>
+                </div>
+                
+                <div class="row d-flex flex-column flex-md-row">
+                    <div class="col p-3">
+                        <label for="address" class="form-label fw-medium">Permanent Address</label>
+                        <textarea type="text" name="mentorAddress" class="form-control border-2 shadow-none" placeholder="Enter your permanent address" ></textarea>
+                    </div>
+                        
+                </div>
+                <div class="row d-flex flex-column flex-md-row">
+                    <div class="col p-3">
+                        <label for="password" class="form-label fw-medium">Password</label>
+                        <input type="text" name="mentorPassword" class="form-control border-2 shadow-none" placeholder="Create your password" >
+                    </div>
+                        
+                    <div class="col p-3">
+                        <label for="confirmPassword" class="form-label fw-medium">Confirm Password</label>
+                        <input type="text" name="mentorConfirmPassword" class="form-control border-2 shadow-none" placeholder="Confirm your password" >
+                    </div>
+                </div>
+                
+    
+                <div class="links my-4">
+                    Already have an account? <a href="{% url "login_page" %}">Login Now</a>
+                </div>
+    
+                <div class="registerBtn">
+                    <input type="submit" id="register" class="btn btn-primary" value="Sign Up">
+                </div>
+            </form>
+    
+            <form id="menteeRegisterForm" action="" method="POST" enctype="multipart/form-data" style="display: none">
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="menteeName" class="form-label fw-medium">Mentee Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="menteeName" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="rollNo" class="form-label fw-medium">Roll No</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="rollNo" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="course" class="form-label fw-medium">Course</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="course" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="branch" class="form-label fw-medium">Branch</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="branch" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="semester" class="form-label fw-medium">Semester</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="semester" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="mentor" class="form-label fw-medium">Mentor</label>
+                        <select class="form-select" name="mentor" id="selectSignUpForm" aria-label="Default select example">
+                            <option value="" class="form-label fw-medium border-2 shadow-none">Select Your Mentor</option>
+                            {% comment %} @if(count($mentors) > 0)
+                                @foreach($mentors as $mentorName => $id)
+                                    <option value="{{ $id }}">{{ $mentorName }}</option>
+                                @endforeach
+                            @endif {% endcomment %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="menteePhone" class="form-label fw-medium">Phone</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="menteePhone" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="menteeEmail" class="form-label fw-medium">Email</label>
+                        <input type="email" class="form-control border-2 shadow-none" name="email" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="fatherName" class="form-label fw-medium">Father's Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="fatherName" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="fatherPhone" class="form-label fw-medium">Father's Phone</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="fatherPhone" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="fatherProfession" class="form-label fw-medium">Father's Profession</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="fatherProfession" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="address" class="form-label fw-medium">Address</label>
+                        <input type="text" class="form-control border-2 shadow-none" name="address" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="profilePic" class="form-label fw-medium">Profile Picture</label>
+                        <input class="form-control border-2 shadow-none" type="file" name="profilePicture">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="menteePassword" class="form-label fw-medium">Password</label>
+                        <input type="password" class="form-control border-2 shadow-none" name="menteePassword" required>
+                    </div>
+                </div>
+                <div class="row my-4">
+                    <span>
+                        Already have an account? <a href="{% url "login_page" %}">Login Now</a>
+                    </span>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Sign Up" />
+            </form>
+    
+        </div>
+    </div>
+    
+    <script src="{% static "/js/jQuery/jquery.js" %}"></script>
+    <script>
+        $(document).ready(function() {
+            
+            $("#selectSignUpForm").on("change", function() {
+                if ($(this).val() === "mentor") {
+                    $("#mentorRegisterForm").css("display", "block");
+                    $("#menteeRegisterForm").css("display", "none");
+                    $("#userType").text("Mentor");
+                }
+                else {
+                    $("#menteeRegisterForm").css("display", "block");
+                    $("#mentorRegisterForm").css("display", "none");
+                    $("#userType").text("Mentee");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
