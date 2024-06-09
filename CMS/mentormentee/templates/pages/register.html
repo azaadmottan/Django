@@ -23,6 +23,8 @@
         </figure>
     </header>
 
+    {% include "components/toast.html" %}
+
     <div class="bg-body-secondary py-3">
         <div class="container bg-white border border-2 p-4 rounded-3">
             <h2 class="mb-4">Sign Up Now as <span id="userType">Mentor</span></h2>
@@ -34,22 +36,23 @@
             </select>
     
             <form id="mentorRegisterForm" method="POST">
+                {% csrf_token %}
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
-                        <label for="name" class="form-label fw-medium">Name</label>
-                        <input type="text" value="" name="mentorName" class="form-control border-2 shadow-none" placeholder="Enter your name">
+                        <label for="mentorName" class="form-label fw-medium">Name</label>
+                        <input type="text" value="" id="mentorName" class="form-control border-2 shadow-none" placeholder="Enter your name">
                         
                     </div>
                     <div class="col p-3">
                         <label for="empId" class="form-label fw-medium">Employee Id</label>
-                        <input type="text" name="empId" class="form-control border-2 shadow-none" placeholder="Enter your employee id" >
+                        <input type="text" id="empId" class="form-control border-2 shadow-none" placeholder="Enter your employee id" >
                     </div>
                 </div>
     
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
                         <label for="department" class="form-label fw-medium">Department</label>
-                        <select name="department" name="department" class="form-control border-2 shadow-none pointer" required>
+                        <select id="department" class="form-control border-2 shadow-none pointer" required>
                             <option value="none" default>Select Department</option>
                             <option value="CSE">Computer Science &amp; Engg</option>
                             <option value="ECE">Electrical Communication Engg</option>
@@ -68,31 +71,31 @@
     
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
-                        <label for="phone" class="form-label fw-medium">Mobile No.</label>
-                        <input type="number" name="mentorPhone" class="form-control border-2 shadow-none" placeholder="Enter your mobile number" >
+                        <label for="mentorPhone" class="form-label fw-medium">Mobile No.</label>
+                        <input type="number" id="mentorPhone" class="form-control border-2 shadow-none" placeholder="Enter your mobile number" >
                     </div>
                     <div class="col p-3">
-                        <label for="email" class="form-label fw-medium">Email id</label>
-                        <input type="email" name="mentorEmail" class="form-control border-2 shadow-none" placeholder="Enter your email id" >
+                        <label for="mentorEmail" class="form-label fw-medium">Email id</label>
+                        <input type="email" id="mentorEmail" class="form-control border-2 shadow-none" placeholder="Enter your email id" >
                     </div>
                 </div>
                 
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
-                        <label for="address" class="form-label fw-medium">Permanent Address</label>
-                        <textarea type="text" name="mentorAddress" class="form-control border-2 shadow-none" placeholder="Enter your permanent address" ></textarea>
+                        <label for="mentorAddress" class="form-label fw-medium">Permanent Address</label>
+                        <textarea type="text" id="mentorAddress" class="form-control border-2 shadow-none" placeholder="Enter your permanent address" ></textarea>
                     </div>
                         
                 </div>
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
-                        <label for="password" class="form-label fw-medium">Password</label>
-                        <input type="text" name="mentorPassword" class="form-control border-2 shadow-none" placeholder="Create your password" >
+                        <label for="mentorPassword" class="form-label fw-medium">Password</label>
+                        <input type="text" id="mentorPassword" class="form-control border-2 shadow-none" placeholder="Create your password" >
                     </div>
                         
                     <div class="col p-3">
-                        <label for="confirmPassword" class="form-label fw-medium">Confirm Password</label>
-                        <input type="text" name="mentorConfirmPassword" class="form-control border-2 shadow-none" placeholder="Confirm your password" >
+                        <label for="mentorConfirmPassword" class="form-label fw-medium">Confirm Password</label>
+                        <input type="text" id="mentorConfirmPassword" class="form-control border-2 shadow-none" placeholder="Confirm your password" >
                     </div>
                 </div>
                 
@@ -102,11 +105,12 @@
                 </div>
     
                 <div class="registerBtn">
-                    <input type="submit" id="register" class="btn btn-primary" value="Sign Up">
+                    <input type="submit" id="mentorRegister" class="btn btn-primary" value="Sign Up">
                 </div>
             </form>
     
-            <form id="menteeRegisterForm" action="" method="POST" enctype="multipart/form-data" style="display: none">
+            <form id="menteeRegisterForm" method="POST" enctype="multipart/form-data" style="display: none">
+                {% csrf_token %}
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="menteeName" class="form-label fw-medium">Mentee Name</label>
@@ -189,13 +193,14 @@
                         Already have an account? <a href="{% url "login_page" %}">Login Now</a>
                     </span>
                 </div>
-                <input type="submit" class="btn btn-primary" value="Sign Up" />
+                <input type="submit" id="menteeRegister" class="btn btn-primary" value="Sign Up" />
             </form>
     
         </div>
     </div>
     
     <script src="{% static "/js/jQuery/jquery.js" %}"></script>
+    <script src="{% static "/js/toast.js" %}"></script>
     <script>
         $(document).ready(function() {
             
@@ -210,6 +215,83 @@
                     $("#mentorRegisterForm").css("display", "none");
                     $("#userType").text("Mentee");
                 }
+            });
+
+            function validateEmail(email) {
+                let pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return pattern.test(email);
+            }
+
+            $("#mentorRegister").on("click", function(e) {
+                e.preventDefault();
+
+                let name = $("#mentorName").val();
+                let empId = $("#empId").val();
+                let department = $("#department").find(":selected").val();
+                let phone = $("#mentorPhone").val();
+                let email = $("#mentorEmail").val();
+                let address = $("#mentorAddress").val();
+                let password = $("#mentorPassword").val();
+                let confirmPassword = $("#mentorConfirmPassword").val();
+
+                let form = $("#mentorRegisterForm");
+
+                const csrftoken = form.find('input[type="hidden"]').val();
+
+                if (name === "" || empId === "" || department === "none" || phone === "" || email === "" || address === "" || password === "" || confirmPassword === "") {                   
+                    message("danger", "All fields are required");   
+                    return;
+                }
+                else {
+                    if (phone.length !== 10)
+                    {
+                        message("danger", "Invalid phone number");
+                        return;
+                    }
+
+                    if (password.length < 8 && confirmPassword.length < 8)
+                    {
+                        message("warning", "Password must be at least 8 characters long");
+                        return;
+                    }
+
+                    if (!validateEmail(email)) {
+
+                        message("danger", "Invalid email address");
+                        return;
+                    }
+
+                    if (password === confirmPassword && password.length >= 8 && phone.length === 10)
+                    {
+                        $.ajax({
+                            url : "{% url 'mentor_register' %}",
+                            type : "POST",
+                            data : {csrfmiddlewaretoken: csrftoken, mentorName: name, empId: empId, department: department, mentorPhone: phone, mentorEmail: email, mentorAddress: address, mentorPassword: password },
+
+                            success : function(response){
+                                if (response.process === "success"){
+                                    message("success", response.message);
+                                    $("#mentorRegisterForm").trigger("reset")
+                                }
+                                else{
+                                    message("danger", response.message);
+                                }
+                            },
+                            error: function(response) {
+                                message("danger", "Something went wrong please try again");
+                                return;
+                            }
+                        });
+                    }
+                    else 
+                    {
+                        if (password !== confirmPassword){
+                            message("danger", "Password & Confirm Password doesn't match");
+                        }
+                    }
+
+                }
+
             });
         });
     </script>
