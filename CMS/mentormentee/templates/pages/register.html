@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up @srisaigroup.in</title>
+    <title>Sign Up @SSGI | @srisaigroup.in | Transforming Dreams into Reality.</title>
     <link rel="shortcut icon" href="{% static "/images/favicon.ico" %}" type="image/x-icon">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -114,32 +114,36 @@
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="menteeName" class="form-label fw-medium">Mentee Name</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="menteeName" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="menteeName" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="rollNo" class="form-label fw-medium">Roll No</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="rollNo" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="rollNo" required>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="course" class="form-label fw-medium">Course</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="course" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="course" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="branch" class="form-label fw-medium">Branch</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="branch" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="branch" required>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="semester" class="form-label fw-medium">Semester</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="semester" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="semester" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="mentor" class="form-label fw-medium">Mentor</label>
-                        <select class="form-select" name="mentor" id="selectSignUpForm" aria-label="Default select example">
-                            <option value="" class="form-label fw-medium border-2 shadow-none">Select Your Mentor</option>
+                        <select class="form-select" id="mentor" aria-label="Default select example">
+                            <option value="none" class="form-label fw-medium border-2 shadow-none">Select Your Mentor</option>
+                            <option value="5">Rakesh Gupta</option>
+                            <option value="7">Deepak Kumar</option>
+                            <option value="8">Shivangi Sharma</option>
+                            <option value="9">Ragu Pathak</option>
                             {% comment %} @if(count($mentors) > 0)
                                 @foreach($mentors as $mentorName => $id)
                                     <option value="{{ $id }}">{{ $mentorName }}</option>
@@ -151,41 +155,41 @@
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="menteePhone" class="form-label fw-medium">Phone</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="menteePhone" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="menteePhone" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="menteeEmail" class="form-label fw-medium">Email</label>
-                        <input type="email" class="form-control border-2 shadow-none" name="email" required>
+                        <input type="email" class="form-control border-2 shadow-none" id="menteeEmail" required>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="fatherName" class="form-label fw-medium">Father's Name</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="fatherName" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="fatherName" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="fatherPhone" class="form-label fw-medium">Father's Phone</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="fatherPhone" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="fatherPhone" required>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
                         <label for="fatherProfession" class="form-label fw-medium">Father's Profession</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="fatherProfession" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="fatherProfession" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="address" class="form-label fw-medium">Address</label>
-                        <input type="text" class="form-control border-2 shadow-none" name="address" required>
+                        <input type="text" class="form-control border-2 shadow-none" id="address" required>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-6">
                         <label for="profilePic" class="form-label fw-medium">Profile Picture</label>
-                        <input class="form-control border-2 shadow-none" type="file" name="profilePicture">
+                        <input class="form-control border-2 shadow-none" title="Choose your profile picture" type="file" id="profilePicture">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="menteePassword" class="form-label fw-medium">Password</label>
-                        <input type="password" class="form-control border-2 shadow-none" name="menteePassword" required>
+                        <input type="password" class="form-control border-2 shadow-none" id="menteePassword" required>
                     </div>
                 </div>
                 <div class="row my-4">
@@ -222,6 +226,7 @@
                 return pattern.test(email);
             }
 
+            // mentor registration
             $("#mentorRegister").on("click", function(e) {
                 e.preventDefault();
 
@@ -292,6 +297,107 @@
 
                 }
 
+            });
+
+            // mentee registration
+            $("#menteeRegister").on("click", function(e) {
+                e.preventDefault();
+
+                let name = $("#menteeName").val();
+                let rollNo = $("#rollNo").val();
+                let course = $("#course").val();
+                let branch = $("#branch").val();
+                let semester = $("#semester").val();
+                let mentor = $("#mentor").find(":selected").val();
+                let phone = $("#menteePhone").val();
+                let email = $("#menteeEmail").val();
+                let fatherName = $("#fatherName").val();
+                let fatherPhone = $("#fatherPhone").val();
+                let fatherProfession = $("#fatherProfession").val();
+                let address = $("#address").val();
+                let password = $("#menteePassword").val();
+
+                let profilePic = $("#profilePicture");
+                let file = profilePic[0].files[0];
+
+
+                let form = $("#menteeRegisterForm");
+
+                const csrftoken = form.find('input[type="hidden"]').val();
+
+                if (name === "" || rollNo === "" || course === "" || branch === "" || semester === "" || mentor === "none" || phone === "" || email === "" || fatherName === "" || fatherPhone === "" || fatherProfession === "" || address === "" || password === "") {                   
+                    message("danger", "All fields are required");   
+                    return;
+                }
+                else {
+                    if (!file) {
+                        message("danger", "Please select profile picture");
+                        return;
+                    }
+
+                    if (phone.length !== 10 || fatherPhone.length !== 10){
+                        message("danger", "Invalid phone number");
+                        return;
+                    }
+
+                    if (password.length < 8){
+                        message("warning", "Password must be at least 8 characters long");
+                        return;
+                    }
+
+                    if (!validateEmail(email)){
+                        message("danger", "Invalid email address");
+                        return;
+                    }
+
+                    if (email && password){
+                        let formData = new FormData($("#menteeRegisterForm")[0]);
+
+                        formData.append('csrfmiddlewaretoken', csrftoken);
+                        formData.append('menteeName', name);
+                        formData.append('menteeEmail', email);
+                        formData.append('menteePassword', password);
+                        formData.append('roll_no', rollNo);
+                        formData.append('course', course);
+                        formData.append('branch', branch);
+                        formData.append('semester', semester);
+                        formData.append('mentor', mentor);
+                        formData.append('menteePhone', phone);
+                        formData.append('fatherName', fatherName);
+                        formData.append('fatherPhone', fatherPhone);
+                        formData.append('fatherProfession', fatherProfession);
+                        formData.append('menteeAddress', address);
+                        formData.append('menteeProfilePicture', file);
+
+                        $.ajax({
+                            url : "{% url 'mentee_register' %}",
+                            type : "POST",
+                            data : formData,
+                            processData: false,
+                            contentType: false,
+
+                            success : function(response){
+                                if (response.process === "success"){
+                                    message("success", response.message);
+                                    $("#menteeRegisterForm").trigger("reset")
+                                }
+                                else{
+                                    message("danger", response.message);
+                                }
+                            },
+                            error: function(response) {
+                                message("danger", "Something went wrong please try again");
+                                return;
+                            }
+                        });
+                    }
+                    else 
+                    {
+                        if (!email || !password){
+                            message("danger", "Email & Password must be provided !");
+                        }
+                    }
+                }
             });
         });
     </script>
