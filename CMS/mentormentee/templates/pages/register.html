@@ -400,12 +400,15 @@
                                     message("success", response.message);
                                     $("#menteeRegisterForm").trigger("reset")
                                 }
-                                else{
+                                else if (response.process === "failed"){
                                     message("danger", response.message);
+                                }
+                                else {
+                                    message("warning", "Something went wrong please try again later");
                                 }
                             },
                             error: function(response) {
-                                message("danger", response.message);
+                                message("danger", "Something went wrong");
                                 return;
                             }
                         });
