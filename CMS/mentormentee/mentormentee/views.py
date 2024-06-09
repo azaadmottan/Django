@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from .models import MentorProfile, MenteeProfile
 from django.http import JsonResponse
+from django.db import transaction
 
 def welcome(request):
     return render(request, 'home/welcome.html')
@@ -10,12 +11,15 @@ def login(request):
     return render(request, 'pages/login.html')
 
 def register(request):
-    return render(request, 'pages/register.html')
+    mentors = MentorProfile.objects.all()
+    return render(request, 'pages/register.html', { 'mentors': mentors })
 
 def mentorRegister(request):
     if request.method == 'POST':
         username = request.POST.get('mentorName')
         email_id = request.POST.get('mentorEmail')
+        firstName = request.POST.get('mentorFirstName')
+        lastName = request.POST.get('mentorLastName')
         password = request.POST.get('mentorPassword')
         emp_id = request.POST.get('empId')
         department = request.POST.get('department')
@@ -29,7 +33,7 @@ def mentorRegister(request):
                 'process': 'failed'
             })
         
-        user = User.objects.filter(username = username)
+        user = User.objects.filter(username=username)
 
         if user.exists():
             return JsonResponse({
@@ -38,7 +42,21 @@ def mentorRegister(request):
                 'process': 'failed'
             })
 
-        mentor = User.objects.create(username = username, email = email_id)
+        if MentorProfile.objects.filter(emp_id=emp_id).exists():
+            return JsonResponse({
+                'status': 400   , 
+                'message': 'Employee Id already exists', 
+                'process': 'failed'
+            })
+        
+        if User.objects.filter(email=email_id).exists():
+            return JsonResponse({
+                'status': 400   , 
+                'message': 'Email address already exists', 
+                'process': 'failed'
+            })
+        
+        mentor = User.objects.create(username = username, email = email_id, first_name = firstName, last_name = lastName)
         mentor.set_password(password)
 
         mentor.save()
@@ -70,6 +88,8 @@ def menteeRegister(request):
         username = request.POST.get('menteeName')
         email_id = request.POST.get('menteeEmail')
         password = request.POST.get('menteePassword')
+        firstName = request.POST.get('menteeFirstName')
+        lastName = request.POST.get('menteeLastName')
         roll_no = request.POST.get('roll_no')
         course = request.POST.get('course')
         branch = request.POST.get('branch')
@@ -92,7 +112,11 @@ def menteeRegister(request):
         try:
             mentor_id = MentorProfile.objects.get(id=mentor_id)
         except MentorProfile.DoesNotExist:
-            return JsonResponse({'status': 404, 'message': 'Mentor does not exist', 'process': 'failed'})
+            return JsonResponse({
+                'status': 404, 
+                'message': 'Mentor does not exist', 
+                'process': 'failed'
+            })
 
         user = User.objects.filter(username = username)
 
@@ -103,33 +127,54 @@ def menteeRegister(request):
                 'process': 'failed'
             })
 
-        mentee = User.objects.create(username = username, email = email_id)
-        mentee.set_password(password)
+        try: 
+            if MenteeProfile.objects.filter(roll_no=roll_no).exists():
+                return JsonResponse({
+                'status': 400   , 
+                'message': 'Roll number already exists', 
+                'process': 'failed'
+            })
+            if User.objects.filter(email=email_id).exists():
+                return JsonResponse({
+                'status': 400   , 
+                'message': 'Email address already exists', 
+                'process': 'failed'
+            })
+            with transaction.atomic():
+                mentee = User.objects.create(username = username, email = email_id, first_name = firstName, last_name = lastName)
+                mentee.set_password(password)
 
-        mentee.save()
+                mentee.save()
 
-        mentee_profile = MenteeProfile(
-            username = mentee, 
-            roll_no = roll_no, 
-            course = course, 
-            branch = branch, 
-            semester = semester, 
-            mentor = mentor_id, 
-            phone = phone, 
-            father_name = father_name,
-            father_phone = father_phone,
-            father_profession = father_profession,
-            address = address,
-            profile_picture = profile_picture
-        )
+                mentee_profile = MenteeProfile(
+                    username = mentee, 
+                    roll_no = roll_no, 
+                    course = course, 
+                    branch = branch, 
+                    semester = semester, 
+                    mentor = mentor_id, 
+                    phone = phone, 
+                    father_name = father_name,
+                    father_phone = father_phone,
+                    father_profession = father_profession,
+                    address = address,
+                    profile_picture = profile_picture
+                )
 
-        mentee_profile.save()
+                mentee_profile.save()
 
-        return JsonResponse({
-            'status': 200, 
-            'message': 'Mentee registered successfully', 
-            'process': 'success'
-        })
+            return JsonResponse({
+                'status': 200, 
+                'message': 'Mentee registered successfully', 
+                'process': 'success'
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 500,
+                'message': str(e),
+                'process': 'failed'
+            })
     else:
         return JsonResponse({
             'status': 405, 

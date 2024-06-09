@@ -39,7 +39,7 @@
                 {% csrf_token %}
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
-                        <label for="mentorName" class="form-label fw-medium">Name</label>
+                        <label for="mentorName" class="form-label fw-medium">Username</label>
                         <input type="text" value="" id="mentorName" class="form-control border-2 shadow-none" placeholder="Enter your name">
                         
                     </div>
@@ -48,7 +48,16 @@
                         <input type="text" id="empId" class="form-control border-2 shadow-none" placeholder="Enter your employee id" >
                     </div>
                 </div>
-    
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="mentorFirstName" class="form-label fw-medium">First Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" id="mentorFirstName" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="mentorLastName" class="form-label fw-medium">Last Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" id="mentorLastName" required>
+                    </div>
+                </div>
                 <div class="row d-flex flex-column flex-md-row">
                     <div class="col p-3">
                         <label for="department" class="form-label fw-medium">Department</label>
@@ -113,12 +122,22 @@
                 {% csrf_token %}
                 <div class="row mb-2">
                     <div class="form-group col-md-6">
-                        <label for="menteeName" class="form-label fw-medium">Mentee Name</label>
+                        <label for="menteeName" class="form-label fw-medium">Username</label>
                         <input type="text" class="form-control border-2 shadow-none" id="menteeName" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="rollNo" class="form-label fw-medium">Roll No</label>
                         <input type="text" class="form-control border-2 shadow-none" id="rollNo" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="form-group col-md-6">
+                        <label for="menteeFirstName" class="form-label fw-medium">First Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" id="menteeFirstName" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="menteeLastName" class="form-label fw-medium">Last Name</label>
+                        <input type="text" class="form-control border-2 shadow-none" id="menteeLastName" required>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -140,15 +159,9 @@
                         <label for="mentor" class="form-label fw-medium">Mentor</label>
                         <select class="form-select" id="mentor" aria-label="Default select example">
                             <option value="none" class="form-label fw-medium border-2 shadow-none">Select Your Mentor</option>
-                            <option value="5">Rakesh Gupta</option>
-                            <option value="7">Deepak Kumar</option>
-                            <option value="8">Shivangi Sharma</option>
-                            <option value="9">Ragu Pathak</option>
-                            {% comment %} @if(count($mentors) > 0)
-                                @foreach($mentors as $mentorName => $id)
-                                    <option value="{{ $id }}">{{ $mentorName }}</option>
-                                @endforeach
-                            @endif {% endcomment %}
+                            {% for mentor in mentors %}
+                                <option value="{{ mentor.id }}">{{ mentor.username }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -231,6 +244,8 @@
                 e.preventDefault();
 
                 let name = $("#mentorName").val();
+                let firstName = $("#mentorFirstName").val();
+                let lastName = $("#mentorLastName").val();
                 let empId = $("#empId").val();
                 let department = $("#department").find(":selected").val();
                 let phone = $("#mentorPhone").val();
@@ -243,7 +258,7 @@
 
                 const csrftoken = form.find('input[type="hidden"]').val();
 
-                if (name === "" || empId === "" || department === "none" || phone === "" || email === "" || address === "" || password === "" || confirmPassword === "") {                   
+                if (name === "" || firstName === "" || lastName === "" || empId === "" || department === "none" || phone === "" || email === "" || address === "" || password === "" || confirmPassword === "") {                   
                     message("danger", "All fields are required");   
                     return;
                 }
@@ -271,7 +286,7 @@
                         $.ajax({
                             url : "{% url 'mentor_register' %}",
                             type : "POST",
-                            data : {csrfmiddlewaretoken: csrftoken, mentorName: name, empId: empId, department: department, mentorPhone: phone, mentorEmail: email, mentorAddress: address, mentorPassword: password },
+                            data : {csrfmiddlewaretoken: csrftoken, mentorName: name, mentorFirstName: firstName, mentorLastName: lastName, empId: empId, department: department, mentorPhone: phone, mentorEmail: email, mentorAddress: address, mentorPassword: password },
 
                             success : function(response){
                                 if (response.process === "success"){
@@ -305,6 +320,8 @@
 
                 let name = $("#menteeName").val();
                 let rollNo = $("#rollNo").val();
+                let firstName = $("#menteeFirstName").val();
+                let lastName = $("#menteeLastName").val();
                 let course = $("#course").val();
                 let branch = $("#branch").val();
                 let semester = $("#semester").val();
@@ -325,7 +342,7 @@
 
                 const csrftoken = form.find('input[type="hidden"]').val();
 
-                if (name === "" || rollNo === "" || course === "" || branch === "" || semester === "" || mentor === "none" || phone === "" || email === "" || fatherName === "" || fatherPhone === "" || fatherProfession === "" || address === "" || password === "") {                   
+                if (name === "" || rollNo === "" || menteeFirstName === "" || menteeLastName === "" || course === "" || branch === "" || semester === "" || mentor === "none" || phone === "" || email === "" || fatherName === "" || fatherPhone === "" || fatherProfession === "" || address === "" || password === "") {                   
                     message("danger", "All fields are required");   
                     return;
                 }
@@ -357,6 +374,8 @@
                         formData.append('menteeName', name);
                         formData.append('menteeEmail', email);
                         formData.append('menteePassword', password);
+                        formData.append('menteeFirstName', firstName);
+                        formData.append('menteeLastName', lastName);
                         formData.append('roll_no', rollNo);
                         formData.append('course', course);
                         formData.append('branch', branch);
@@ -386,7 +405,7 @@
                                 }
                             },
                             error: function(response) {
-                                message("danger", "Something went wrong please try again");
+                                message("danger", response.message);
                                 return;
                             }
                         });
