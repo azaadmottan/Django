@@ -3,12 +3,90 @@ from django.contrib.auth.models import User
 from .models import MentorProfile, MenteeProfile
 from django.http import JsonResponse
 from django.db import transaction
+from django.contrib.auth import authenticate, login, logout
 
 def welcome(request):
     return render(request, 'home/welcome.html')
 
-def login(request):
+def login_page(request):
     return render(request, 'pages/login.html')
+
+def get_user_role(user):
+    try:
+        MentorProfile.objects.get(username=user[0].id)
+        return 'Mentor'
+    except MentorProfile.DoesNotExist:
+        pass
+
+    try:
+        MenteeProfile.objects.get(username=user[0].id)
+        return 'Mentee'
+    except MenteeProfile.DoesNotExist:
+        return 'Unknown'
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not username or not password:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Username & Password must be provided',
+                'process': 'failed'
+            })
+
+        user = User.objects.filter(username=username)
+
+        if not user.exists():
+            return JsonResponse({
+                'status': 404,
+                'message': 'Invalid user credentials ! (Wrong username)',
+                'process': 'failed'
+            })
+
+        user_role = get_user_role(user)
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Invalid user credentials! (Wrong password)',
+                'process': 'failed'
+            })
+
+        login(request, user)
+
+        if request.user.is_authenticated:
+            return JsonResponse({
+                'status': 200,
+                'message': 'Login successful',
+                'user_role': user_role,
+                'process': 'login success'
+            })
+        else:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Login failed',
+                'process': 'login failed'
+            })
+    else:
+        return JsonResponse({
+            'status': 400,
+            'message': 'Invalid request method',
+            'process': 'failed'
+        })
+
+def logout_user(request):
+    logout(request)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'status': 200,
+            'message': 'Logout successful',
+            'process': 'logout success'
+        })
 
 def register(request):
     mentors = MentorProfile.objects.all()

@@ -1,0 +1,255 @@
+{% extends "layout/dashboard.html" %}
+
+{% comment %} title {% endcomment %}
+{% block title %}
+    {% if request.user %}
+        @ {{ request.user.first_name}} {{ request.user.last_name }}
+    {% else %}
+        @ Mentor
+    {% endif %}
+    | Welcome to the Mentor Dashboard | SSGI | srisaigroup.in
+{% endblock title %}
+
+{% comment %} navlinks {% endcomment %}
+{% block dashboard_nav_links %}
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url "mentor_dashboard" %}">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">About</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Contact</a>
+    </li>
+    <li class="nav-item dropdown">
+        <span class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Dropdown
+        </span>
+        <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Another action</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Something else here</a></li>
+        </ul>
+    </li>
+{% endblock dashboard_nav_links %}
+
+{% comment %} dropdown menus {% endcomment %}
+{% block drop_menu %}
+
+    <!-- Messages Dropdown Menu -->
+    <li class="nav-item dropdown dropdown-center">
+        <span class="nav-link" data-bs-toggle="dropdown" role="button" >
+        <i class="far fa-comments"></i>
+        <span class="badge text-bg-danger">3</span>
+        </span>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-center">
+        <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+            <div class="media-body">
+                <h6 class="dropdown-item-title">
+                Brad Diesel
+                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                </h6>
+                <p class="text-sm">Call me whenever you can...</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+            </div>
+            </div>
+            <!-- Message End -->
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+            <div class="media-body">
+                <h6 class="dropdown-item-title">
+                John Pierce
+                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                </h6>
+                <p class="text-sm">I got your message bro</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+            </div>
+            </div>
+            <!-- Message End -->
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <!-- Message Start -->
+            <div class="media">
+            <div class="media-body">
+                <h6 class="dropdown-item-title">
+                Nora Silvester
+                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
+                </h6>
+                <p class="text-sm">The subject goes here</p>
+                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+            </div>
+            </div>
+            <!-- Message End -->
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+        </div>
+    </li>
+
+    <!-- Notifications Dropdown Menu -->
+    <li class="nav-item dropdown">
+        <a class="nav-link" data-bs-toggle="dropdown" role="button">
+        <i class="far fa-bell"></i>
+        <span class="badge text-bg-danger">15</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-item dropdown-header">15 Notifications</span>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 4 new messages
+            <span class="float-right text-muted text-sm">3 mins</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        </div>
+    </li>
+
+    <!-- User profile Dropdown Menu -->
+    <li class="nav-item dropdown">
+        <span class="nav-link rounded px-3 bg-body-secondary" data-bs-toggle="dropdown" role="button">
+        <i class="fa-solid fa-user"></i>
+        </span>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-item dropdown-header">15 Notifications</span>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 4 new messages
+            <span class="float-right text-muted text-sm">3 mins</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <span class="dropdown-item dropdown-footer pt-2" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal">
+            <i class="fa-solid fa-right-from-bracket me-3"></i> Logout
+        </span>
+        </div>
+    </li>
+    
+{% endblock drop_menu %}
+
+{% comment %} search form {% endcomment %}
+{% block search_form %}
+    <span class="nav-item nav-link rounded px-3 py-2 bg-body-secondary d-none d-lg-inline-block d-xl-none" id="search-icon" role="button">
+        <i class="fa-solid fa-magnifying-glass text-white"></i>
+    </span>
+
+    <form class="d-flex d-lg-none d-xl-flex search-form" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+{% endblock search_form %}
+
+{% comment %} username {% endcomment %}
+{% block dash_username %}
+    {% if request.user %}
+        {{ request.user.first_name }}
+        {{ request.user.last_name }}
+    {% endif %}
+{% endblock dash_username %}
+
+{% comment %} sidebar links {% endcomment %}
+{% block sidebar_links %}
+    <a class="nav-link" href="#">
+        <span class="">
+            <i class="fa-solid fa-gauge-high me-3"></i>Dashboard 
+        </span>
+        <i class="fa-solid fa-angle-right"></i>
+    </a>
+    <a class="nav-link" href="#">
+        <span>
+            <i class="fa-solid fa-users me-3"></i>Mentees
+        </span>
+        <i class="fa-solid fa-angle-right"></i>
+    </a>
+    <a class="nav-link" href="#">
+        <span>
+            <i class="fa-solid fa-comment me-3"></i>Queries 
+        </span>
+        <i class="fa-solid fa-angle-right"></i>
+    </a>
+{% endblock sidebar_links %}
+
+{% comment %} dashboard title {% endcomment %}
+{% block dashboard_title %}
+    Mentor
+{% endblock dashboard_title %}
+
+{% comment %} dashboard main section {% endcomment %}
+{% block dashboard_main_section %}
+    <div>
+        <h4>
+            Welcome, 
+            {% if request.user %}
+                {{ request.user.first_name }} {{ request.user.last_name }}
+                @{{ request.user.username }}
+            {% endif %}
+        </h4>
+    </div>
+{% endblock dashboard_main_section %}
+
+{% comment %} external js {% endcomment %}
+{% block external_js %}
+    <script>
+        $(document).ready(function() {
+            $("#search-icon").on("click", function() {
+                $(".search-form").toggleClass("show-search-form");
+            });
+        });
+    </script>
+{% endblock external_js %}
+
+
+{% comment %} ajax js {% endcomment %}
+{% block external_ajax_js %}
+    <script>
+
+    $(document).ready(function() {
+
+        // logout button
+        $("#logoutBtn").on("click", function(e) {
+
+            e.preventDefault();
+    
+            $.ajax({
+                url: "{% url 'logout_mentor' %}",
+    
+                success: function(response) {
+                    if(response.process === "logout success") {
+
+                        window.location.href = "{% url 'login_page' %}";
+                    }
+                    else {
+                        message("danger", "Failed to logout !!");
+                    }
+                }
+            })
+        });
+    });
+
+    </script>
+{% endblock external_ajax_js %}
