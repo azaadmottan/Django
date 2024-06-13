@@ -135,14 +135,16 @@
 
                             success : function(response){
                                 if (response.process === "login success"){
-                                    message("success", "Login successful");
                                     $("#loginForm").trigger("reset")
 
-                                    if (response.user_role === "Mentor"){
+                                    if (response.user_role === "web_admin") {
+                                        window.location.href = "{% url 'web_admin_dashboard' %}"
+                                    }
+                                    else if (response.user_role === "mentor"){
                                         window.location.href = "{% url 'mentor_dashboard' %}";
                                     }
-                                    else if (response.user_role === "Mentee"){
-                                        window.location.href = "{% url 'mentee_index' %}";
+                                    else if (response.user_role === "mentee"){
+                                        window.location.href = "{% url 'mentee_dashboard' %}";
                                     }
                                 }
                                 else{

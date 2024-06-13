@@ -1,13 +1,13 @@
-{% extends "layout/mentor_dashboard.html" %}
+{% extends "layout/webadmin_dashboard.html" %}
 
 {% comment %} title {% endcomment %}
 {% block title %}
     {% if request.user %}
         @ {{ request.user.first_name}} {{ request.user.last_name }}
     {% else %}
-        @ Mentor
+        @ Web Admin
     {% endif %}
-    | Welcome to the Mentor Dashboard | SSGI | srisaigroup.in
+    | Welcome to the Web Admin Dashboard | SSGI | srisaigroup.in
 {% endblock title %}
 
 {% comment %} navlinks {% endcomment %}
@@ -45,7 +45,7 @@
             {% endif %}
         </h4>
     </div>
-    
+
     <div class="container bg-secondary mt-4 rounded-2 p-4 ">
         <div>
             <div class="row d-flex flex-column flex-md-row p-2 bg-dark rounded-2">
@@ -102,17 +102,16 @@
 
 {% comment %} external js {% endcomment %}
 {% block external_js %}
-<script>
-</script>
+    <script>
+    </script>
 {% endblock external_js %}
 
 
 {% comment %} ajax js {% endcomment %}
 {% block external_ajax_js %}
 <script>
-
     $(document).ready(function() {
-    });
 
+    });
 </script>
 {% endblock external_ajax_js %}

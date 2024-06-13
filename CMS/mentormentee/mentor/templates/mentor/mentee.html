@@ -1,0 +1,46 @@
+{% extends "layout/mentor_dashboard.html" %}
+
+{% block dashboard_title %}
+    - Mentee Users
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+        <form method="post">
+            <input type="text" class="form-control border-2 shadow-none fs-5" placeholder="Search mentees here...">
+        </form>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded-2">
+
+            <div class="row">
+                <h4 class="text-center">Your Mentees</h4>
+            </div>
+
+            <div class="row">
+                <div class="my-2 d-flex align-items-center justify-content-end">
+                    <button class="btn btn-primary" id="exportMenteeData"><i class="fa-solid fa-download me-2"></i>Export Data</button>
+                </div>
+            </div>
+
+            <div id="mentorMenteesRecord" class="overflow-x-auto overflow-y-auto" style="height: 345px;"></div>
+
+        </div>
+
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded-2">
+            <div class="row">
+                <h4 class="text-center">Mentees</h4>
+            </div>
+
+            <div id="menteesRecord" class="overflow-x-auto overflow-y-auto" style="height: 345px;"></div>
+
+        </div>
+
+    </div>
+{% endblock dashboard_main_section %}

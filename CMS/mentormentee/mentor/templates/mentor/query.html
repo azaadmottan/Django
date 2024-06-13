@@ -1,0 +1,26 @@
+{% extends "layout/mentor_dashboard.html" %}
+
+{% block dashboard_title %}
+    - Mentee Queries
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+        <form method="post">
+            <input type="text" class="form-control border-2 shadow-none fs-5" placeholder="Search mentees here...">
+        </form>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded">
+            <div class="row">
+                <h4 class="text-center">Mentees Query</h4>
+            </div>
+
+            <div id="menteeQueries" class="overflow-x-auto overflow-y-auto" style="height: 600px"></div>
+
+        </div>
+
+    </div>
+{% endblock dashboard_main_section %}

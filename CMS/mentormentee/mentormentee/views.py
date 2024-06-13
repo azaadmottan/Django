@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .models import MentorProfile, MenteeProfile
+from .models import WebAdminProfile, MentorProfile, MenteeProfile
 from django.http import JsonResponse
 from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
@@ -13,14 +13,20 @@ def login_page(request):
 
 def get_user_role(user):
     try:
-        MentorProfile.objects.get(username=user[0].id)
-        return 'Mentor'
+        web_admin = WebAdminProfile.objects.get(username=user[0].id)
+        return web_admin
+    except WebAdminProfile.DoesNotExist:
+        pass
+    
+    try:
+        mentor = MentorProfile.objects.get(username=user[0].id)
+        return mentor
     except MentorProfile.DoesNotExist:
         pass
 
     try:
-        MenteeProfile.objects.get(username=user[0].id)
-        return 'Mentee'
+        mentee = MenteeProfile.objects.get(username=user[0].id)
+        return mentee
     except MenteeProfile.DoesNotExist:
         return 'Unknown'
 
@@ -45,7 +51,7 @@ def login_user(request):
                 'process': 'failed'
             })
 
-        user_role = get_user_role(user)
+        get_user = get_user_role(user)
 
         user = authenticate(request, username=username, password=password)
 
@@ -57,6 +63,24 @@ def login_user(request):
             })
 
         login(request, user)
+
+        user_role = get_user.user_type.lower()
+
+        if user_role == 'web_admin':
+            request.session['emp_id'] = get_user.emp_id
+            request.session['phone'] = get_user.phone
+            request.session['address'] = get_user.address
+        elif user_role == 'mentor':
+            request.session['emp_id'] = get_user.emp_id
+            request.session['phone'] = get_user.phone
+            request.session['address'] = get_user.address
+        elif user_role == 'mentee':
+            request.session['roll_no'] = get_user.roll_no
+            request.session['course'] = get_user.course
+            request.session['branch'] = get_user.branch
+            request.session['semester'] = get_user.semester
+            request.session['phone'] = get_user.phone
+            request.session['address'] = get_user.address
 
         if request.user.is_authenticated:
             return JsonResponse({
@@ -76,16 +100,6 @@ def login_user(request):
             'status': 400,
             'message': 'Invalid request method',
             'process': 'failed'
-        })
-
-def logout_user(request):
-    logout(request)
-
-    if not request.user.is_authenticated:
-        return JsonResponse({
-            'status': 200,
-            'message': 'Logout successful',
-            'process': 'logout success'
         })
 
 def register(request):

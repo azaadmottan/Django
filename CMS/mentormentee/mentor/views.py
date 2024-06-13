@@ -24,3 +24,9 @@ def logout_user(request):
             'message': 'Failed to logout',
             'process': 'failed'
         })
+
+def mentee(request):
+    return render(request, 'mentor/mentee.html')
+
+def query(request):
+    return render(request, 'mentor/query.html')
