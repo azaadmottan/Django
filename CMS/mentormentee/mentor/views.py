@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -29,11 +29,12 @@ def logout_user(request):
 
 @login_required(login_url='login_page')
 def mentee(request):
-    mentees = User.objects.filter(mentee_profile__user_type='mentee')
-
-    return render(request, 'mentor/mentee.html', {'mentees': mentees})
+    return render(request, 'mentor/mentee.html')
 
 def get_mentee_profile(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
     if request.method == 'POST':
         mentee_id = request.POST.get('menteeId')
 
@@ -76,6 +77,9 @@ def get_mentee_profile(request):
             })
 
 def get_mentees_of_mentor(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
     if request.method == 'POST':
 
         try:
@@ -87,6 +91,7 @@ def get_mentees_of_mentor(request):
             for mentee in mentees:
                 mentees_data.append({
                     'id': mentee.username.id,
+                    'profile_id': mentee.id,
                     'username': mentee.username.username,  # Assuming username is the related User model
                     'roll_no': mentee.roll_no,
                     'course': mentee.course,
@@ -105,7 +110,55 @@ def get_mentees_of_mentor(request):
                 'message': 'No mentee found'
             })
 
+def get_unassigned_mentees(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        try:
+            mentor = MentorProfile.objects.get(username=User.objects.get(id=request.session.get('user_id')))
+
+            # Retrieve all mentees excluding those already assigned to the current mentor
+            mentees = User.objects.filter(
+                mentee_profile__user_type='mentee'
+            ).exclude(mentee_profile__mentor=mentor)
+
+            mentees_data = list(mentees.values(
+                'id',
+                'mentee_profile__id',
+                'username',
+                'mentee_profile__roll_no',
+                'mentee_profile__course',
+                'mentee_profile__branch',
+                'mentee_profile__semester',
+                'mentee_profile__phone',
+                'mentee_profile__address',
+                'mentee_profile__mentor__username__username'
+            ))
+
+            return JsonResponse({
+                'status': 200,
+                'mentees': mentees_data,
+                'process': 'success'
+            })
+
+        except MenteeProfile.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'No mentee were found',
+                'process': 'failed'
+            })
+    else:
+        return JsonResponse({
+            'status': 405,
+            'message': 'Method not allowed',
+            'process': 'failed'
+        })
+
 def add_mentee(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
     if request.method == 'POST':
         mentee_id = request.POST.get('menteeId')
 
@@ -135,6 +188,49 @@ def add_mentee(request):
             'process': 'failed'
         })
 
+def remove_mentee(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        mentee_id = request.POST.get('menteeId')
+
+        if not mentee_id:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Mentee Id must be provided',
+                'process': 'failed'
+            })
+        try:
+            mentee_profile = get_object_or_404(MenteeProfile, username=mentee_id)
+
+            if str(request.user.username) == str(mentee_profile.mentor.username):
+                mentee_profile.mentor = None
+                mentee_profile.save()
+                
+                return JsonResponse({
+                    'status': 200,
+                    'message': 'Mentee removed successfully',
+                    'process':'success'
+                })
+            else:
+                return JsonResponse({
+                    'status': 403,
+                    'message': 'You are not authorized to remove this mentee',
+                    'process': 'failed'
+                })
+        except MenteeProfile.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Mentee does not exist',
+                'process': 'failed'
+            })
+    else:
+        return JsonResponse({
+            'status': 405,
+            'message': 'Method not allowed',
+            'process': 'failed'
+        })
 
 @login_required(login_url='login_page')
 def query(request):
