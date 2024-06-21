@@ -31,7 +31,7 @@ class MenteeProfile(models.Model):
     course = models.CharField(max_length=255)
     branch = models.CharField(max_length=255)
     semester = models.CharField(max_length=255)
-    mentor = models.ForeignKey(MentorProfile, on_delete=models.SET_NULL, null=True)
+    mentor = models.ForeignKey(MentorProfile, on_delete=models.SET_NULL, null=True, blank=True)
     phone = models.IntegerField()
     father_name = models.CharField(max_length=255)
     father_phone = models.IntegerField()

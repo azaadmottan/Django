@@ -67,14 +67,17 @@ def login_user(request):
         user_role = get_user.user_type.lower()
 
         if user_role == 'web_admin':
+            request.session['user_id'] = user.id
             request.session['emp_id'] = get_user.emp_id
             request.session['phone'] = get_user.phone
             request.session['address'] = get_user.address
         elif user_role == 'mentor':
+            request.session['user_id'] = user.id
             request.session['emp_id'] = get_user.emp_id
             request.session['phone'] = get_user.phone
             request.session['address'] = get_user.address
         elif user_role == 'mentee':
+            request.session['user_id'] = user.id
             request.session['roll_no'] = get_user.roll_no
             request.session['course'] = get_user.course
             request.session['branch'] = get_user.branch
