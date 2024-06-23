@@ -1,0 +1,152 @@
+{% extends "layout/mentee_dashboard.html" %}
+
+{% comment %} title {% endcomment %}
+{% block title %}
+    {% if request.user.first_name %}
+        @ {{ request.user.first_name}} {{ request.user.last_name }}
+    {% else %}
+        @ Mentee
+    {% endif %}
+    | Welcome to the Mentee Dashboard | SSGI | srisaigroup.in
+{% endblock title %}
+
+{% comment %} dashboard title {% endcomment %}
+{% block dashboard_title %}
+    - Connect with Your Mentor through Queries
+{% endblock dashboard_title %}
+
+{% comment %} dashboard main section {% endcomment %}
+{% block dashboard_main_section %}
+    <div class="container bg-body-secondary mt-4 rounded-2 p-4">
+        <form method="post" id="menteeQuery">
+        <div class="row d-flex flex-column flex-md-row p-2 bg-dark-subtle rounded-2">
+            <label for="title" class="form-label fs-5 fw-medium">Title</label>
+            <input type="text" id="title" class="form-control border-2 shadow-none fs-5" placeholder="Enter title here...">
+        </div>
+
+        <div class="row d-flex flex-column flex-md-row p-2 mt-2 bg-dark-subtle rounded-2">
+            <label for="description" class="form-label fs-5 fw-medium">Description</label>
+            <textarea type="text" id="description" class="form-control border-2 shadow-none fs-5" placeholder="Enter description here..."></textarea>
+        </div>
+
+        <div>
+            <input type="submit" value="Submit" id="submitQuery" class="btn btn-primary mt-4 fw-medium">
+        </div>
+        </form>
+    </div>
+
+    <div class="container bg-body-secondary mt-4 rounded-2 p-md-4">
+
+        <div class="">
+            <div class="row">
+                <h3 class="text-center">Your Query</h3>
+            </div>
+
+            <div id="menteeCards" class="row mt-3">
+            </div>
+
+        </div>
+    </div>
+
+{% endblock dashboard_main_section %}
+
+{% comment %} ajax js {% endcomment %}
+{% block external_ajax_js %}
+<script>
+    $(document).ready(function() {
+        function getQueries() {
+            $.ajax({
+                url : "{% url 'get_query' %}",
+                type : "POST",
+                data : {csrfmiddlewaretoken: "{{ csrf_token }}"},
+                
+                success : function(response){
+                    if (response.process == "success") {
+                        $("#menteeQuery").trigger("reset");
+
+                        let cardContainer = $('#menteeCards');
+                        cardContainer.empty();  // Clear any existing cards
+
+                        response.data.forEach(item => {
+                            let card = `
+                            <div class="col-md-6">
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h5 class="card-title">${item.subject}</h5>
+                                        <span class="badge text-bg-danger">${item.status.toUpperCase()}</span>
+                                    </div>
+                                    <div class="card-body px-1 py-2">
+                                        <div class="accordion accordion-flush shadow-none" id="${item.subject}">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed d-flex gap-3" type="button" data-bs-toggle="collapse" data-bs-target="#${item.created_at}" aria-expanded="false" aria-controls="flush-collapseOne">
+                                                    <h6>Mentor: ${item.mentor_name__username}</h6>
+                                                    <h6>Mentee: ${item.mentee_name__username}</h6>
+                                                </button>
+                                                </h2>
+                                                <div id="${item.created_at}" class="accordion-collapse collapse" data-bs-parent="#${item.subject}">
+                                                    <div class="accordion-body">
+                                                        Description: ${item.description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-between border-top p-2">
+                                            <span class="card-text" style="font-size: 12px;">Created At: ${new Date(item.created_at).toLocaleString()}</span>
+                                            <span class="card-text" style="font-size: 12px;">Updated At: ${new Date(item.updated_at).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            cardContainer.append(card);
+                        });
+                    }
+                    else if (response.process == "failed") {
+                        message("danger", response.message);
+                    }
+                },
+                error: function(response) {
+                    message("danger", "Something went wrong, please try again later");
+                }
+            });
+        }
+        getQueries();
+
+        $("#submitQuery").on("click", function(e) {
+
+            e.preventDefault();
+
+            let title = $("#title").val();
+            let description = $("#description").val();
+
+            if (title === "" || description === "") {
+                message("danger", "All fields are required");
+                return;
+            }
+            else {
+
+                $.ajax({
+                    url : "{% url 'add_query' %}",
+                    type : "POST",
+                    data : { subject: title, description: description, csrfmiddlewaretoken: "{{ csrf_token }}"},
+                    
+                    success : function(response){
+                        if (response.process == "success") {
+                            $("#menteeQuery").trigger("reset");
+                            message("success", "Query submitted successfully");
+                            getQueries();
+                        }
+                        else if (response.process == "failed") {
+                            message("danger", response.message);
+                        }
+                    },
+                    error: function(response) {
+                        message("danger", "Something went wrong, please try again later");
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock external_ajax_js %}

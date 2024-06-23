@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -257,7 +257,7 @@
         <nav class="nav flex-column p-2">
             <span class="username nav-link text-white p-3 mb-2 border-bottom border-dark-subtle" aria-current="page">
                 <i class="fa-solid fa-user me-2"></i>
-                {% if request.user %}
+                {% if request.user.first_name %}
                     {{ request.user.first_name }}
                     {{ request.user.last_name }}
                 {% endif %}
@@ -265,13 +265,13 @@
                 {% endblock dash_username %}
             </span>
 
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{% url "mentee_dashboard" %}">
                 <span class="">
                     <i class="fa-solid fa-gauge-high me-3"></i>Dashboard 
                 </span>
                 <i class="fa-solid fa-angle-right"></i>
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{% url "mentee_query" %}">
                 <span>
                     <i class="fa-solid fa-comment me-3"></i>Queries 
                 </span>
@@ -302,10 +302,12 @@
         </div>
 
         <div class="d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center p-2 mt-3 border-top">
-            Copyright &copy; 2024-2030 &nbsp; <a href="{% url "welcome_page" %}">srisaigroup.in</a>. &nbsp; All rights reserved.
+            Copyright &copy; 2024-2030 &nbsp; <a href="{% url 'welcome_page' %}" class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" >srisaigroup.in</a>. &nbsp; All rights reserved.
         </div>
     </div>
 
+    {% comment %} toast component {% endcomment %}
+    {% include "components/toast.html" %}
     {% comment %} logoutModal {% endcomment %}
     {% include "components/modal.html" %}
     

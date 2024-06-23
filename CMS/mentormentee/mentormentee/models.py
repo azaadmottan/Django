@@ -43,3 +43,21 @@ class MenteeProfile(models.Model):
 
     def __str__(self):
         return f"{self.username} (mentee) {self.roll_no} (Roll No)"
+
+class MenteeQuery(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('ongoing', 'Ongoing/InProgress'),
+        ('completed', 'Completed')
+    ]
+    mentee_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mentee_name')
+    mentor_name = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='mentor_name')
+    subject = models.CharField(max_length=355)
+    description = models.TextField(max_length=1000)
+    status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.mentee_name} (mentee) | {self.mentor_name} (mentor) | {self.subject} (subject)"
+    

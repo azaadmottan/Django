@@ -2,7 +2,7 @@
 
 {% comment %} title {% endcomment %}
 {% block title %}
-    {% if request.user %}
+    {% if request.user.first_name %}
         @ {{ request.user.first_name}} {{ request.user.last_name }}
     {% else %}
         @ Mentor
@@ -39,9 +39,11 @@
     <div>
         <h4>
             Welcome, 
-            {% if request.user %}
+            {% if request.user.first_name %}
                 {{ request.user.first_name }} {{ request.user.last_name }}
                 @{{ request.user.username }}
+            {% else %}
+                Mentor
             {% endif %}
         </h4>
     </div>

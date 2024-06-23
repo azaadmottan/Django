@@ -39,11 +39,57 @@
     <div>
         <h4>
             Welcome, 
-            {% if request.user %}
+            {% if request.user.first_name %}
                 {{ request.user.first_name }} {{ request.user.last_name }}
                 @{{ request.user.username }}
+            {% else %}
+                Mentee
             {% endif %}
         </h4>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4 ">
+        <div>
+            <div class="row d-flex flex-column flex-md-row p-2 bg-dark rounded-2">
+                <div class="col fw-medium fs-5">
+                    Username: {% if request.user.username %}{{request.user.username}}{% endif %}
+                </div>
+                <div class="col fw-medium fs-5">
+                    Email: {% if request.user.email %}{{request.user.email}}{% endif %}
+                </div>
+            </div>
+            <div class="row d-flex flex-column flex-md-row p-2 mt-2 bg-dark rounded-2">
+                <div class="col fw-medium fs-5">
+                    Roll No: {% if request.session.roll_no %}{{request.session.roll_no}}{% endif %}
+                </div>
+                <div class="col fw-medium fs-5">
+                    Mobile No: {% if request.session.phone %}{{request.session.phone}}{% endif %}
+                </div>
+            </div>
+            <div class="row d-flex flex-column flex-md-row p-2 mt-2 bg-dark rounded-2">
+                <div class="col fw-medium fs-5">
+                    Address: {% if request.session.address %}{{request.session.address}}{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="container bg-body-secondary mt-4 rounded-2 p-4">
+
+        <div class="row p-2 mt-3 bg-dark-subtle text-center rounded-1">
+            <h4>Current Notifications</h4>
+        </div>
+
+        <div class="notification-container mt-3 bg-dark-subtle rounded-3">
+            <div class="brands">
+                <div class="brands__preWrapper position-relative z-0">
+                    <div id="currentNotifications" class="brands__wrapper">
+                    </div>            
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock dashboard_main_section %}
 

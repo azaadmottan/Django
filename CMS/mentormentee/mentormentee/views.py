@@ -78,6 +78,7 @@ def login_user(request):
             request.session['address'] = get_user.address
         elif user_role == 'mentee':
             request.session['user_id'] = user.id
+            request.session['mentor_id'] = get_user.mentor.username.id
             request.session['roll_no'] = get_user.roll_no
             request.session['course'] = get_user.course
             request.session['branch'] = get_user.branch
@@ -111,7 +112,7 @@ def register(request):
 
 def mentorRegister(request):
     if request.method == 'POST':
-        username = request.POST.get('mentorName')
+        username = request.POST.get('mentorName').strip().replace(' ', '').lower()
         email_id = request.POST.get('mentorEmail')
         firstName = request.POST.get('mentorFirstName')
         lastName = request.POST.get('mentorLastName')
@@ -180,7 +181,7 @@ def mentorRegister(request):
 
 def menteeRegister(request):
     if request.method == 'POST':
-        username = request.POST.get('menteeName')
+        username = request.POST.get('menteeName').strip().replace(' ', '').lower()
         email_id = request.POST.get('menteeEmail')
         password = request.POST.get('menteePassword')
         firstName = request.POST.get('menteeFirstName')
