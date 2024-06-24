@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from mentormentee.models import MenteeProfile, MentorProfile
+from mentormentee.models import MenteeProfile, MentorProfile, MenteeQuery
 
 # Create your views here.
 
@@ -231,6 +231,76 @@ def remove_mentee(request):
             'message': 'Method not allowed',
             'process': 'failed'
         })
+
+def get_query(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        query = MenteeQuery.objects.filter(mentor_name=request.session.get('user_id')).order_by('-created_at')
+        query_data = list(query.values(
+            'id',
+            'mentee_name__username',
+            'mentor_name__username',
+            'subject',
+            'description',
+            'status',
+            'created_at',
+            'updated_at',
+        ))
+
+        return JsonResponse({
+            'status': 200,
+            'data': query_data,
+            'message': 'Queries fetched successfully',
+            'process':'success'
+        })
+    else:
+        return JsonResponse({
+            'status': 400,
+            'message': 'Invalid request method',
+            'process': 'failed'
+        })
+
+def update_query_status(request):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+    
+    if request.method == 'POST':
+        query_id = request.POST.get('queryId')
+        status = request.POST.get('queryStatus')
+
+        if not query_id or not status:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Query Id and status must be provided',
+                'process': 'failed'
+            })
+
+        query = MenteeQuery.objects.get(id=query_id)
+
+        if not query:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Query not found',
+                'process': 'failed'
+            })
+        
+        query.status = status
+        query.save()
+
+        return JsonResponse({
+            'status': 200,
+            'message': 'Query status updated successfully',
+            'process':'success'
+        })
+    else:
+        return JsonResponse({
+            'status': 405,
+            'message': 'Method not allowed',
+            'process': 'failed'
+        })
+
 
 @login_required(login_url='login_page')
 def query(request):

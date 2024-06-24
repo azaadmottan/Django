@@ -35,6 +35,9 @@
         ::-webkit-scrollbar-thumb:hover {
             background-color: #44455f; 
         }
+        nav {
+            user-select: none;
+        }
         .navbar-brand {
             background-color: #ff2f2f;
             color: #fff;
@@ -137,55 +140,14 @@
                     <li class="nav-item dropdown dropdown-center">
                         <span class="nav-link" data-bs-toggle="dropdown" role="button" >
                         <i class="far fa-comments"></i>
-                        <span class="badge text-bg-danger">3</span>
+                        <span class="badge text-bg-danger" id="total-messages">0</span>
                         </span>
-                        <div class="dropdown-menu dropdown-menu-lg dropdown-center">
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                Brad Diesel
-                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">Call me whenever you can...</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+
+                        <div class="dropdown-menu dropdown-menu-sm dropdown-center">
+                            <div id="message-container" class="overflow-y-auto" style="height: 200px;">
+                                
                             </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                John Pierce
-                                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">I got your message bro</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                Nora Silvester
-                                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">The subject goes here</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                            <a href="{% url "mentee_queries" %}" class="dropdown-item dropdown-footer">See All Messages</a>
                         </div>
                     </li>
 
@@ -377,10 +339,53 @@
                     }
                 })
             });
+
+            // get message Notifications
+            function getMessageNotifications() {
+                $.ajax({
+                    url : "{% url 'get_mentee_queries' %}",
+                    type : "POST",
+                    data : {csrfmiddlewaretoken: "{{ csrf_token }}"},
+                    
+                    success : function(response){
+                        if (response.process == "success") {
+                            let messages = $("#message-container");
+                            messages.empty();
+                            let countMsg = 0;
+                            response.data.forEach(item => {
+                                if (item.status == "pending"){
+                                    let message = `
+                                    <span class="dropdown-item px-3 py-1">
+                                        <div>
+                                            <h6 class="dropdown-item-title">
+                                            ${item.mentee_name__username}
+                                            <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                            </h6>
+                                            <p class="text-sm">${item.subject}</p>
+                                            <p class="text-sm" style="font-size: 12px;"><i class="far fa-clock me-2"></i>${new Date(item.created_at).toLocaleString()}</p>
+                                        </div>
+                                    </span>
+                                    <div class="dropdown-divider"></div>
+                                    `;
+
+                                    messages.append(message);
+                                    countMsg++;
+                                }
+                            });
+                            $("#total-messages").text(countMsg);
+                        }
+                    },
+                    error: function(response) {
+                        message("danger", "Something went wrong, please try again later");
+                    }
+                });
+            }
+            getMessageNotifications();
+
+            {% block external_ajax_js %}
+            {% endblock external_ajax_js %}
         });
     </script>
 
-    {% block external_ajax_js %}
-    {% endblock external_ajax_js %}
 </body>
 </html>

@@ -12,4 +12,6 @@ urlpatterns = [
     path('add-mentee/', views.add_mentee, name='add_mentee'),
     path('remove-mentee/', views.remove_mentee, name='remove_mentee'),
     path('mentee-queries/', views.query, name='mentee_queries'),
+    path('get-mentee-queries/', views.get_query, name='get_mentee_queries'),
+    path('update-query-status/', views.update_query_status, name='update_query_status'),
 ]

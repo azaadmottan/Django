@@ -68,12 +68,22 @@
                         cardContainer.empty();  // Clear any existing cards
 
                         response.data.forEach(item => {
+                            let badgeClr = "danger";
+                            if (item.status == "pending") {
+                                badgeClr = "danger";
+                            }
+                            else if (item.status == "ongoing") {
+                                badgeClr = "warning";
+                            }
+                            else if (item.status == "completed") {
+                                badgeClr = "success";
+                            }
                             let card = `
                             <div class="col-md-6">
                                 <div class="card mb-4 shadow-sm">
                                     <div class="card-header d-flex align-items-center justify-content-between">
                                         <h5 class="card-title">${item.subject}</h5>
-                                        <span class="badge text-bg-danger">${item.status.toUpperCase()}</span>
+                                        <span class="badge text-bg-${badgeClr}">${item.status.toUpperCase()}</span>
                                     </div>
                                     <div class="card-body px-1 py-2">
                                         <div class="accordion accordion-flush shadow-none" id="${item.subject}">
