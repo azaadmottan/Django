@@ -4,12 +4,223 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from mentormentee.models import MenteeProfile, MentorProfile, MenteeQuery
+import os
+from django.conf import settings
 
 # Create your views here.
 
 @login_required(login_url='login_page')
 def index(request):
     return render(request, 'mentor/dashboard.html')
+
+@login_required(login_url='login_page')
+def mentor_profile(request):
+    return render(request, 'mentor/profile.html')
+
+def get_profile_picture(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'GET':
+        try:
+            mentor = get_object_or_404(MentorProfile, username=request.user.id)
+            profile_picture = mentor.profile_picture.url
+            return JsonResponse({
+                'status': 200,
+                'profile_picture': profile_picture,
+                'message': 'Profile picture fetched successfully',
+                'process':'success'
+            })
+        except:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Mentor has no profile picture.',
+                'process': 'failed'
+            })
+
+def update_profile_picture(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        profile_picture = request.FILES.get('profile_picture')
+
+        if not profile_picture:
+            return JsonResponse({
+                'status': 400,
+                'message': 'Profile picture must be provided',
+                'process': 'failed'
+            })
+        
+        try:
+            mentor = get_object_or_404(MentorProfile, username=request.session.get('user_id'))
+
+            # Check if there is an existing profile picture and delete it
+            if mentor.profile_picture:
+                old_picture_path = os.path.join(settings.MEDIA_ROOT, mentor.profile_picture.name)
+                if os.path.exists(old_picture_path):
+                    os.remove(old_picture_path)
+
+            mentor.profile_picture = profile_picture
+            mentor.save()
+
+            return JsonResponse({
+                'status': 200,
+                'message': 'Mentor profile picture updated successfully',
+                'process':'success'
+            })
+        except:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Mentor profile not found',
+                'process': 'failed'
+            })
+
+def get_profile_data(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        try:
+            user = get_object_or_404(User, username=request.user.username)
+            mentor_profile = get_object_or_404(MentorProfile, username=request.session.get('user_id'))
+
+            user_data = {
+                'first_name': user.first_name or '',
+                'last_name': user.last_name or '',
+                'username': user.username,
+                'email': user.email or ''
+            }
+
+            mentor_profile_data = {
+                'dob': mentor_profile.dob.isoformat() if mentor_profile.dob else '',
+                'phone': mentor_profile.phone or '',
+                'address': mentor_profile.address or '',
+                'city': mentor_profile.city or '',
+                'region': mentor_profile.region or '',
+                'postal_code': mentor_profile.postal_code or '',
+                'nationality': mentor_profile.nationality or '',
+                'updated_at': (mentor_profile.updated_at or mentor_profile.created_at).isoformat() if mentor_profile.updated_at else mentor_profile.created_at.isoformat()
+            }
+
+            return JsonResponse({
+                'status': 200,
+                'data': {
+                    'user': user_data,
+                    'mentor_profile': mentor_profile_data
+                },
+                'message': 'Mentor profile data fetched successfully',
+                'process':'success'
+            })
+        except User.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'User not found',
+                'process': 'failed'
+            })
+        except MentorProfile.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Mentor profile not found',
+                'process': 'failed'
+            })
+
+def update_profile_info(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    firstName = request.POST.get('first_name')
+    lastName = request.POST.get('last_name')
+    dob = request.POST.get('dob')
+    phone = request.POST.get('phone_number')
+
+    if not firstName or not lastName or not dob or not phone:
+        return JsonResponse({
+            'status': 400,
+            'message': 'All fields must be provided',
+            'process': 'failed'
+        })
+
+    try:
+        user = get_object_or_404(User, username=request.user.username)
+        mentor = get_object_or_404(MentorProfile, username=request.session.get('user_id'))
+
+        user.first_name = firstName
+        user.last_name = lastName
+        mentor.dob = dob
+        mentor.phone = phone
+
+        user.save()
+        mentor.save()
+
+        return JsonResponse({
+            'status': 200,
+            'message': 'Mentor personal information updated successfully',
+            'process':'success'
+        })
+    except User.DoesNotExist:
+        return JsonResponse({
+            'status': 404,
+            'message': 'User not found',
+            'process': 'failed'
+        })
+    except MentorProfile.DoesNotExist:
+        return JsonResponse({
+            'status': 404,
+            'message': 'Mentor profile not found',
+            'process': 'failed'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 404,
+            'message': 'Something went wrong, while updating personal profile information',
+            'process': 'failed'
+        })
+
+def update_profile_location(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+    
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        region = request.POST.get('region')
+        postCode = request.POST.get('post_code')
+        nation = request.POST.get('nation')
+
+        if not address or not city or not region or not postCode or not nation:
+            return JsonResponse({
+                'status': 400,
+                'message': 'All fields must be provided',
+                'process': 'failed'
+            })
+
+        try:
+            mentor = get_object_or_404(MentorProfile, username=request.session.get('user_id'))
+            mentor.address = address
+            mentor.city = city
+            mentor.region = region
+            mentor.postal_code = postCode
+            mentor.nationality = nation
+
+            mentor.save()
+
+            return JsonResponse({
+                'status': 200,
+                'message': 'Mentor profile location updated successfully',
+                'process':'success'
+            })
+
+        except MentorProfile.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'Mentor profile not found',
+                'process': 'failed'
+            })
+
+@login_required(login_url='login_page')
+def profile_settings(request):
+    pass
 
 def logout_user(request):
     logout(request)

@@ -25,7 +25,7 @@
     </div>
 {% endblock dashboard_main_section %}
 
-{% block external_ajax_js %}
+{% block external_common_ajax_js %}
     function getQueries() {
         $.ajax({
             url : "{% url 'get_mentee_queries' %}",
@@ -131,4 +131,4 @@
             }
         });
     });
-{% endblock external_ajax_js %}
+{% endblock external_common_ajax_js %}

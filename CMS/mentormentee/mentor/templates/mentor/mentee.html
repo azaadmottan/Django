@@ -49,7 +49,8 @@
 
 
 {% block external_ajax_js %}
-
+<script>
+    $(document).ready(function() {
     // create table for get unassigned mentees
     function createTableUMentee(data) {
         let table = $('<table class="table table-hover table-dark"></table>');
@@ -262,4 +263,7 @@
             }
         });
     });
+
+    });
+</script>
 {% endblock external_ajax_js %}

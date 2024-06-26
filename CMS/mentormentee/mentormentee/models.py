@@ -8,6 +8,7 @@ class WebAdminProfile(models.Model):
     address = models.TextField(max_length=455)
     user_type = models.CharField(max_length=100, default='web_admin')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.username} (web_admin) {self.emp_id} (Employee Id)"
@@ -18,9 +19,16 @@ class MentorProfile(models.Model):
     emp_id = models.CharField(max_length=255, unique=True, db_index=True)
     department = models.CharField(max_length=255)
     phone = models.IntegerField()
-    address = models.TextField(max_length=455)
     user_type = models.CharField(max_length=100, default='mentor')
+    profile_picture = models.ImageField(upload_to='mentorProfilePicture/', blank=True, null=True)
+    dob = models.DateField(max_length=255, null=True, blank=True)
+    address = models.TextField(max_length=455)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    region = models.CharField(max_length=255, null=True, blank=True)
+    postal_code = models.CharField(max_length=255, null=True, blank=True)
+    nationality = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.username} (mentor) {self.emp_id} (Employee Id)"
@@ -37,9 +45,10 @@ class MenteeProfile(models.Model):
     father_phone = models.IntegerField()
     father_profession = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
-    profile_picture = models.ImageField(upload_to='menteeProfilePicture/', blank=True)
+    profile_picture = models.ImageField(upload_to='menteeProfilePicture/', blank=True, null=True)
     user_type = models.CharField(max_length=255, default='mentee')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.username} (mentee) {self.roll_no} (Roll No)"
@@ -60,4 +69,3 @@ class MenteeQuery(models.Model):
 
     def __str__(self):
         return f"{self.mentee_name} (mentee) | {self.mentor_name} (mentor) | {self.subject} (subject)"
-    
