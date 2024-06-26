@@ -219,6 +219,64 @@ def update_profile_location(request):
             })
 
 @login_required(login_url='login_page')
+def profile_settings(request):
+    return render(request,'mentee/profile_settings.html')
+
+def update_mentee_password(request):
+    if request.headers.get('x-requested-with')!= 'XMLHttpRequest':
+        return HttpResponseBadRequest("<h2>You do not have permission to access this endpoint.</h2>")
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        oldPassword = request.POST.get('oldPassword')
+        newPassword = request.POST.get('newPassword')
+        confirmPassword = request.POST.get('confirmPassword')
+
+        if not username or not oldPassword or not newPassword or not confirmPassword:
+            return JsonResponse({
+                'status': 400,
+                'message': 'All fields must be provided',
+                'process': 'failed'
+            })
+
+        if not (username == request.user.username):
+            return JsonResponse({
+                'status': 400,
+                'message': 'Provided username is invalid. Please enter valid username',
+                'process': 'failed'
+            })
+
+        try:
+            user = User.objects.get(username=username)
+
+            if not user.check_password(oldPassword):
+                return JsonResponse({
+                    'status': 400,
+                    'message': 'Old password is incorrect',
+                    'process': 'failed'
+                })
+
+            if not (newPassword == confirmPassword):
+                return JsonResponse({
+                    'status': 400,
+                    'message': 'New password & Confirm password do not match',
+                    'process': 'failed'
+                })
+            user.set_password(newPassword)
+            user.save()
+            return JsonResponse({
+                'status': 200,
+                'message': 'Password updated successfully',
+                'process':'success'
+            })
+        except User.DoesNotExist:
+            return JsonResponse({
+                'status': 404,
+                'message': 'User not found',
+                'process': 'failed'
+            })
+
+@login_required(login_url='login_page')
 def mentee_query(request):
     return render(request, 'mentee/query.html')
 

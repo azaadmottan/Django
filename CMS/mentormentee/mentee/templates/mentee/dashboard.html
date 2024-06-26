@@ -40,8 +40,8 @@
         <h4>
             Welcome, 
             {% if request.user.first_name %}
-                {{ request.user.first_name }} {{ request.user.last_name }}
-                @{{ request.user.username }}
+                <span id="mentor-name"></span>
+                @<span id="username-1"></span>
             {% else %}
                 Mentee
             {% endif %}
@@ -52,10 +52,10 @@
         <div>
             <div class="row d-flex flex-column flex-md-row p-2 bg-dark rounded-2">
                 <div class="col fw-medium fs-5">
-                    Username: {% if request.user.username %}{{request.user.username}}{% endif %}
+                    Username: <span id="username-2"></span>
                 </div>
                 <div class="col fw-medium fs-5">
-                    Email: {% if request.user.email %}{{request.user.email}}{% endif %}
+                    Email: <span id="email-id"></span>
                 </div>
             </div>
             <div class="row d-flex flex-column flex-md-row p-2 mt-2 bg-dark rounded-2">
@@ -63,12 +63,12 @@
                     Roll No: {% if request.session.roll_no %}{{request.session.roll_no}}{% endif %}
                 </div>
                 <div class="col fw-medium fs-5">
-                    Mobile No: {% if request.session.phone %}{{request.session.phone}}{% endif %}
+                    Mobile No: <span id="phone"></span>
                 </div>
             </div>
             <div class="row d-flex flex-column flex-md-row p-2 mt-2 bg-dark rounded-2">
                 <div class="col fw-medium fs-5">
-                    Address: {% if request.session.address %}{{request.session.address}}{% endif %}
+                    Address: <span id="address"></span>
                 </div>
             </div>
         </div>
@@ -105,7 +105,29 @@
 {% block external_ajax_js %}
 <script>
     $(document).ready(function() {
+        // get mentee profile data
+        function getMenteeProfileData() {
+            $.ajax({
+                url: "{% url 'get_mentee_profile_data' %}",
+                type: "POST",
+                data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
 
+                success: function(response) {
+                    if (response.process === 'success') {
+                        $('#mentor-name').text(response.data.user.first_name.toUpperCase() + " " + response.data.user.last_name.toUpperCase());
+                        $('#username-1').text(response.data.user.username);
+                        $('#username-2').text(response.data.user.username);
+                        $('#email-id').text(response.data.user.email);
+                        $('#phone').text(response.data.mentee_profile.phone);
+                        $('#address').text(response.data.mentee_profile.address);
+                    }
+                },
+                error: function(response) {
+                    message('danger', 'Something went wrong, please try again later');
+                }
+            })
+        }
+        getMenteeProfileData();
     });
 </script>
 {% endblock external_ajax_js %}
