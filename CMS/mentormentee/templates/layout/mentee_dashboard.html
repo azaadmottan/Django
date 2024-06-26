@@ -215,22 +215,20 @@
                         <span class="dropdown-item dropdown-header">15 Notifications</span>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
+                            <i class="fas fa-envelope me-2"></i> 4 new messages
                             <span class="float-right text-muted text-sm">3 mins</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
+                        <a href="{% url 'mentee_profile' %}" class="dropdown-item">
+                            <i class="fa-solid fa-address-card me-2"></i>User Profile
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
+                        <a href="{% url 'mentor_profile_settings' %}" class="dropdown-item">
+                            <i class="fa-solid fa-sliders me-2"></i>Profile Settings
                         </a>
                         <div class="dropdown-divider"></div>
                         <span class="dropdown-item dropdown-footer pt-2" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                            <i class="fa-solid fa-right-from-bracket me-3"></i> Logout
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                         </span>
                         </div>
                     </li>
