@@ -34,21 +34,21 @@
         <div class="border border-2 rounded-2 px-3 py-3  mt-4">
         <form method="POST" id="personal-info-form">
             <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="first-name" class="form-label">First Name</label>
                     <input type="text" class="form-control shadow-none" placeholder="Enter your first name" id="first-name" required>
                 </div>
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="last-name" class="form-label">Last Name</label>
                     <input type="text" class="form-control shadow-none" placeholder="Enter your last name" id="last-name" required>
                 </div>
             </div>
             <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="dob" class="form-label">Date of Birth</label>
                     <input type="date" class="form-control shadow-none" id="dob" required>
                 </div>
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="phone-number" class="form-label">Phone Number</label>
                     <input type="number" class="form-control shadow-none" placeholder="Enter your phone number" id="phone-number" required>
                 </div>
@@ -71,21 +71,21 @@
                 </div>
             </div>
             <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="city" class="form-label">City</label>
                     <input type="text" class="form-control shadow-none" id="city" placeholder="Enter your city" required>
                 </div>
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="region" class="form-label">Region</label>
                     <input type="text" class="form-control shadow-none" placeholder="Enter your region" id="region" required>
                 </div>
             </div>
             <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="post-code" class="form-label">Postal Code</label>
                     <input type="text" class="form-control shadow-none" id="post-code" placeholder="Enter your postal code / pin code" required>
                 </div>
-                <div class="mb-3 col-6">
+                <div class="mb-3 col-md-6">
                     <label for="nation" class="form-label">Nationality</label>
                     <input type="text" class="form-control shadow-none" placeholder="Enter your nationality / country" id="nation" required>
                 </div>
@@ -99,6 +99,7 @@
 
 {% block external_ajax_js %}
 <script>
+    $(document).ready(function() {
     const $profileImage = $('#profile-image');
     const $profilePictureInput = $('#profile-picture');
 
@@ -324,6 +325,7 @@
                 message('danger', 'An error occurred. Please try again.');
             }
         });
+    });
     });
 </script>
 {% endblock external_ajax_js %}
