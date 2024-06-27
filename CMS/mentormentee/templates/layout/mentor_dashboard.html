@@ -92,6 +92,12 @@
             width: 60%;
             margin: auto;
         }
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
         {% block internal_css %}
         {% endblock internal_css %}
     </style>
@@ -225,7 +231,7 @@
     </nav>
 
     {% comment %} Sidebar {% endcomment %}
-    <div class="sidebar bg-dark overflow-y-auto border-end border-secondary" id="sidebar">
+    <div class="sidebar bg-dark overflow-y-auto border-end border-secondary d-none d-md-block" id="sidebar">
         <nav class="nav flex-column p-2">
             <span class="username nav-link text-white p-3 mb-2 border-bottom border-dark-subtle" aria-current="page">
                 <i class="fa-solid fa-user me-2"></i>
@@ -264,11 +270,60 @@
         </nav>
     </div>
 
+    {% comment %} Sidebar OffCanvas {% endcomment %}
+    <div class="offcanvas offcanvas-start bg-dark" style="width: 260px;" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-white" id="offcanvasSidebarLabel">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav class="nav flex-column p-2">
+                <span class="username nav-link text-white p-2 mb-2 border-bottom border-dark-subtle" aria-current="page">
+                    <i class="fa-solid fa-user me-2"></i>
+                    {% if request.user.first_name %}
+                        {{ request.user.first_name }}
+                        {{ request.user.last_name }}
+                    {% else %}
+                        Mentor
+                    {% endif %}
+                    {% block dash_username_offcanvas %}
+                    {% endblock dash_username_offcanvas %}
+                </span>
+
+                <a class="nav-link" href="{% url 'mentor_dashboard' %}">
+                    <span>
+                        <i class="fa-solid fa-gauge-high me-3"></i>Dashboard
+                    </span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+                <a class="nav-link" href="{% url 'mentee_users' %}">
+                    <span>
+                        <i class="fa-solid fa-users me-3"></i>Mentees
+                    </span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+                <a class="nav-link" href="{% url 'mentee_queries' %}">
+                    <span>
+                        <i class="fa-solid fa-comment me-3"></i>Queries
+                    </span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+
+                {% block sidebar_links_canvas %}
+                {% endblock sidebar_links_canvas %}
+            </nav>
+        </div>
+    </div>
+
     {% comment %} Main content {% endcomment %}
     <div class="main-content text-bg-dark" id="mainContent">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-1 pb-2 mb-3 border-bottom">
             <div class="d-flex align-items-center">
-                <button class="btn me-2" id="sidebarToggle"><i class="fa-solid fa-bars fs-4 text-bg-dark" title="Toggle Sidebar"></i></button>
+                <button class="btn me-2 d-md-block d-none" id="sidebarToggle"><i class="fa-solid fa-bars fs-4 text-bg-dark" title="Toggle Sidebar"></i></button>
+
+                <!-- Toggle button for offcanvas -->
+                <button class="btn me-2 d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar"><i class="fa-solid fa-bars fs-4 text-bg-dark" title="Toggle Sidebar OffCanvas"></i></button>
+
                 <h3 class="fw-semibold">
                     Mentor Dashboard
                     {% block dashboard_title %}
