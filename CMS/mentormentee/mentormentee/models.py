@@ -12,7 +12,6 @@ class WebAdminProfile(models.Model):
 
     def __str__(self):
         return f"{self.username} (web_admin) {self.emp_id} (Employee Id)"
-    
 
 class MentorProfile(models.Model):
     username = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentor_profile')

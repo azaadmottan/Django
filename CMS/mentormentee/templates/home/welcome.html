@@ -56,7 +56,9 @@
 
         <div class="my-4 fs-5 ">
             <i class="fw-semibold">Let's Explore SSGI </i>
-            <a href="{% url "login_page" %}" class="btn btn-primary btn-sm rounded-pill fw-semibold">Login Now <i class="fa-solid fa-arrow-trend-up"></i></a>
+            {% if not request.user.username %}
+                <a href="{% url "login_page" %}" class="btn btn-primary btn-sm rounded-pill fw-semibold">Login Now <i class="fa-solid fa-arrow-trend-up"></i></a>
+            {% endif %}
         </div>
 
         <h3 class="my-4">Colleges and Courses Offered</h3>

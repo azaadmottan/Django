@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from .models import WebAdminProfile, MentorProfile, MenteeProfile
 from django.http import JsonResponse
 from django.db import transaction
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 
 def welcome(request):
     return render(request, 'home/welcome.html')
@@ -71,11 +71,13 @@ def login_user(request):
             request.session['emp_id'] = get_user.emp_id
             request.session['phone'] = get_user.phone
             request.session['address'] = get_user.address
+            request.session['user_role'] = 'web_admin'
         elif user_role == 'mentor':
             request.session['user_id'] = user.id
             request.session['emp_id'] = get_user.emp_id
             request.session['phone'] = get_user.phone
             request.session['address'] = get_user.address
+            request.session['user_role'] = 'mentor'
         elif user_role == 'mentee':
             request.session['user_id'] = user.id
             request.session['mentor_id'] = get_user.mentor.username.id
@@ -85,6 +87,7 @@ def login_user(request):
             request.session['semester'] = get_user.semester
             request.session['phone'] = get_user.phone
             request.session['address'] = get_user.address
+            request.session['user_role'] = 'mentee'
 
         if request.user.is_authenticated:
             return JsonResponse({

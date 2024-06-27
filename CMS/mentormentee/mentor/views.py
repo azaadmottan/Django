@@ -4,16 +4,19 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from mentormentee.models import MenteeProfile, MentorProfile, MenteeQuery
+from mentormentee.decorators import mentor_required
 import os
 from django.conf import settings
 
 # Create your views here.
 
 @login_required(login_url='login_page')
+@mentor_required
 def index(request):
     return render(request, 'mentor/dashboard.html')
 
 @login_required(login_url='login_page')
+@mentor_required
 def mentor_profile(request):
     return render(request, 'mentor/profile.html')
 
@@ -219,6 +222,7 @@ def update_profile_location(request):
             })
 
 @login_required(login_url='login_page')
+@mentor_required
 def profile_settings(request):
     return render(request,'mentor/profile_settings.html')
 
@@ -293,6 +297,7 @@ def logout_user(request):
         })
 
 @login_required(login_url='login_page')
+@mentor_required
 def mentee(request):
     return render(request, 'mentor/mentee.html')
 
@@ -498,6 +503,7 @@ def remove_mentee(request):
         })
 
 @login_required(login_url='login_page')
+@mentor_required
 def query(request):
     return render(request, 'mentor/query.html')
 
