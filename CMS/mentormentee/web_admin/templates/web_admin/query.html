@@ -1,0 +1,134 @@
+{% extends "layout/webadmin_dashboard.html" %}
+
+{% block dashboard_title %}
+    - Mentee Queries
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+        <form method="post">
+            <input type="text" class="form-control border-2 shadow-none fs-5" placeholder="Search mentees here...">
+        </form>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded">
+            <div class="row">
+                <h4 class="text-center">Mentees Query</h4>
+            </div>
+
+            <div id="menteesQuery" class="row mt-3">
+            </div>
+        </div>
+
+    </div>
+{% endblock dashboard_main_section %}
+
+{% block external_common_ajax_js %}
+    function getQueries() {
+        $.ajax({
+            url : "{% url 'get_mentee_queries' %}",
+            type : "POST",
+            data : {csrfmiddlewaretoken: "{{ csrf_token }}"},
+            
+            success : function(response){
+                if (response.process == "success") {
+                    let cardContainer = $('#menteesQuery');
+                    cardContainer.empty();
+
+                    response.data.forEach(item => {
+                        let badgeClr = "danger";
+                        if (item.status == "pending") {
+                            badgeClr = "danger";
+                        }
+                        else if (item.status == "ongoing") {
+                            badgeClr = "warning";
+                        }
+                        else if (item.status == "completed") {
+                            badgeClr = "success";
+                        }
+                        let card = `
+                        <div class="col-md-6">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <h5 class="card-title">${item.subject}</h5>
+                                    <span class="badge text-bg-${badgeClr}">${item.status.toUpperCase()}</span>
+                                </div>
+                                <div class="card-body px-1 py-2">
+                                    <div class="accordion accordion-flush shadow-none" id="${item.subject}">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed d-flex gap-3" type="button" data-bs-toggle="collapse" data-bs-target="#${item.created_at}" aria-expanded="false" aria-controls="flush-collapseOne">
+                                                <h6>Mentee: ${item.mentee_name__username}</h6>
+                                                <h6>Mentor: ${item.mentor_name__username}</h6>
+                                            </button>
+                                            </h2>
+                                            <div id="${item.created_at}" class="accordion-collapse collapse" data-bs-parent="#${item.subject}">
+                                                <div class="accordion-body">
+                                                    Description: ${item.description}
+                                                </div>
+
+                                                <select class="form-select mb-1 shadow-none currentStatus" data-queryid="${item.id}" aria-label="Query Status">
+                                                    <option value="pending" ${item.status == 'pending' ? 'selected' : ''}>Pending</option>
+                                                    <option value="ongoing" ${item.status == 'ongoing' ? 'selected' : ''}>Ongoing / Inprogress</option>
+                                                    <option value="completed" ${item.status == 'completed' ? 'selected' : ''}>Completed</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between border-top p-2">
+                                        <span class="card-text" style="font-size: 12px;">Created At: ${new Date(item.created_at).toLocaleString()}</span>
+                                        <span class="card-text" style="font-size: 12px;">Updated At: ${new Date(item.updated_at).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        cardContainer.append(card);
+                    });
+                }
+                else if (response.process == "failed") {
+                    message("danger", response.message);
+                }
+            },
+            error: function(response) {
+                message("danger", "Something went wrong, please try again later");
+            }
+        });
+    }
+    getQueries();
+
+    // update query status
+    $(document).on("change", ".currentStatus", function () {
+
+        let queryId = $(this).data("queryid");
+        let queryStatus = $(this).find(":selected").val();
+
+        if (queryStatus == "none") {
+            return; 
+        }
+
+        $.ajax({
+            url: "{% url 'update_query_status' %}",
+            type: "POST",
+            data: { queryId: queryId, queryStatus: queryStatus, csrfmiddlewaretoken: "{{ csrf_token }}" },
+            dataType: "text",
+
+            success: function(response){
+                resp = JSON.parse(response);
+                if (resp.process == "success") {
+                    getQueries();
+                    getMessageNotifications();
+                    message("success", resp.message);
+                }
+                else if (resp.process == "failed") {
+                    message("danger", resp.message);
+                }
+            },
+            error: function(response) {
+                message("danger", "Something went wrong, please try again later");
+            }
+        });
+    });
+{% endblock external_common_ajax_js %}

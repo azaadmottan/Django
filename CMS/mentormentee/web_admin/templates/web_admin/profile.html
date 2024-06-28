@@ -1,0 +1,331 @@
+{% extends "layout/webadmin_dashboard.html" %}
+{% load static %}
+
+{% block dashboard_title %}
+    - Your's Profile
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container">
+        <h4>Your Profile Details</h4>
+        <p>Last edit on <span id="last-update"></span></p>
+    </div>
+
+    <div class="container">
+        <h5 class="mt-4">
+            <i class="fa-solid fa-images me-2 text-primary"></i> Profile Picture
+        </h5>
+
+        <div class="border border-2 rounded-2 px-3 py-3  mt-4">
+            <div class="border border-2 rounded-2 p-2">
+                <img src="{% static 'img/user-image.png' %}" alt="user profile picture" class="rounded-2" id="profile-image" style="height: 180px;">
+            </div>
+            <div class="mt-4 d-flex align-items-center justify-content-start gap-4 ">
+                <input class="form-control" type="file" id="profile-picture"  title="Choose profile picture">
+                <input class="btn btn-danger" type="button" id="delete-profile-picture" value="Delete Picture">
+                <input class="btn btn-primary" type="button" id="update-profile-picture" value="Update Picture">
+            </div>
+        </div>
+
+        <h5 class="mt-4">
+            <i class="fa-solid fa-user me-2 text-primary"></i> Personal Information
+        </h5>
+
+        <div class="border border-2 rounded-2 px-3 py-3  mt-4">
+        <form method="POST" id="personal-info-form">
+            <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                <div class="mb-3 col-md-6">
+                    <label for="first-name" class="form-label">First Name</label>
+                    <input type="text" class="form-control shadow-none" placeholder="Enter your first name" id="first-name" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="last-name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control shadow-none" placeholder="Enter your last name" id="last-name" required>
+                </div>
+            </div>
+            <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                <div class="mb-3 col-md-6">
+                    <label for="dob" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control shadow-none" id="dob" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="phone-number" class="form-label">Phone Number</label>
+                    <input type="number" class="form-control shadow-none" placeholder="Enter your phone number" id="phone-number" required>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-primary" id="updatePersonalInfoBtn" value="Update">
+        </form>
+        </div>
+
+        <h5 class="mt-4">
+            <i class="fa-solid fa-location-dot me-2 text-primary"></i> Personal Location
+        </h5>
+
+        <div class="border border-2 rounded-2 px-3 py-3  mt-4">
+        <form method="POST">
+            <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea type="text" class="form-control shadow-none" id="address" required>
+                    </textarea>
+                </div>
+            </div>
+            <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                <div class="mb-3 col-md-6">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control shadow-none" id="city" placeholder="Enter your city" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="region" class="form-label">Region</label>
+                    <input type="text" class="form-control shadow-none" placeholder="Enter your region" id="region" required>
+                </div>
+            </div>
+            <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                <div class="mb-3 col-md-6">
+                    <label for="post-code" class="form-label">Postal Code</label>
+                    <input type="text" class="form-control shadow-none" id="post-code" placeholder="Enter your postal code / pin code" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="nation" class="form-label">Nationality</label>
+                    <input type="text" class="form-control shadow-none" placeholder="Enter your nationality / country" id="nation" required>
+                </div>
+            </div>
+            <input type="submit" value="Update" class="btn btn-primary" id="updatePersonalLocationBtn">
+        </form>
+        </div>
+    </div>
+{% endblock dashboard_main_section %}
+
+
+{% block external_ajax_js %}
+<script>
+    $(document).ready(function() {
+    const $profileImage = $('#profile-image');
+    const $profilePictureInput = $('#profile-picture');
+
+    // Display image when user selects a new image
+    $profilePictureInput.on('change', function(event) {
+        const file = event.target.files[0];
+
+        if (!file.type.startsWith('image/')){
+            $profileImage.attr('src', '{% static "img/user-image.png" %}');
+            $profilePictureInput.val('');
+            message("danger", "Please select a valid image file");
+            return;
+        }
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $profileImage.attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    const deleteBtn = $("#delete-profile-picture");
+    deleteBtn.on('click', function(e) {
+        $profileImage.attr('src', '{% static "img/user-image.png" %}');
+        $profilePictureInput.val('');
+        getProfilePicture();
+    });
+
+    // get user profile picture
+    function getProfilePicture() {
+        $.ajax({
+            url: "{% url 'get_profile_picture' %}",
+            type: "GET",
+            success: function(response) {
+                if (response.process == 'success') {
+                    $profileImage.attr('src', response.profile_picture);
+                }
+                //else if (response.process == 'failed') {
+                //    message("warning", response.message);
+                //}
+            },
+            error: function(response) {
+                message("danger", "Something went wrong, please try again later");
+            }
+        });
+    }
+    getProfilePicture();
+
+    // update prfoile picture
+    $("#update-profile-picture").on('click', function(e) {
+        e.preventDefault();
+
+        const file = $profilePictureInput[0].files[0];
+        if (!file) {
+            message('danger', 'Please select a image file'); 
+            return;
+        }
+
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                message('danger', 'Please select a valid image file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            formData.append('csrfmiddlewaretoken', "{{ csrf_token }}");
+
+            $.ajax({
+                url: "{% url 'update_profile_picture' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.process =='success') {
+                        message('success', response.message);
+                        getProfilePicture();
+                    }
+                    else if (response.process == 'failed') {
+                        message('danger', response.message);
+                    }
+                },
+                error: function(response) {
+                    message('danger', 'Something went wrong, please try again later');
+                }
+            })
+        }
+    });
+
+    // get mentor profile data
+    function getMentorProfileData() {
+        $.ajax({
+            url: "{% url 'get_profile_data' %}",
+            type: "POST",
+            data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+
+            success: function(response) {
+                if (response.process === 'success') {
+                    // last profile update
+                    $('#last-update').text(new Date(response.data.mentor_profile.updated_at));
+
+                    // perosonal info
+                    $('#first-name').val(response.data.user.first_name);
+                    $('#last-name').val(response.data.user.last_name);
+                    $('#dob').val(response.data.mentor_profile.dob);
+                    $('#phone-number').val(response.data.mentor_profile.phone);
+
+                    // perosonal location
+                    $('#address').val(response.data.mentor_profile.address);
+                    $('#city').val(response.data.mentor_profile.city);
+                    $('#region').val(response.data.mentor_profile.region);
+                    $('#post-code').val(response.data.mentor_profile.postal_code);
+                    $('#nation').val(response.data.mentor_profile.nationality);
+                }
+            },
+            error: function(response) {
+                message('danger', 'Something went wrong, please try again later');
+            }
+        })
+    }
+    getMentorProfileData();
+
+    // update personal information
+    $("#updatePersonalInfoBtn").on('click', function(e) {
+        e.preventDefault();
+
+        let firstName = $("#first-name").val();
+        let lastName = $("#last-name").val();
+        let dob = $("#dob").val();
+        let phoneNumber = $("#phone-number").val();
+
+        if (firstName == '' || lastName == '' || dob == '' || phoneNumber == '') {
+            message('danger', 'Please fill all the required fields');
+            return;
+        }
+
+        if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
+            message('danger', 'Please enter a valid phone number');
+            return;
+        }
+
+        // Validate date format (YYYY-MM-DD)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+            message('danger', 'Please enter a valid date in YYYY-MM-DD format');
+            return;
+        }
+    
+        // Validate logical date (not in the future)
+        let dateOfBirth = new Date(dob);
+        let today = new Date();
+        today.setHours(0, 0, 0, 0); // Ignore time part
+    
+        if (isNaN(dateOfBirth.getTime())) {
+            message('danger', 'Please enter a valid date');
+            return;
+        }
+    
+        if (dateOfBirth > today) {
+            message('danger', 'Date of birth cannot be in the future');
+            return;
+        }
+
+        $.ajax({
+            url: '{% url 'update_profile_info' %}',
+            type: 'POST',
+            data: {
+                'first_name': firstName,
+                'last_name': lastName,
+                'dob': dob,
+                'phone_number': phoneNumber,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.process === 'success') {
+                    message('success', response.message);
+                } else if(response.process === 'failed') {
+                    message('danger', response.message || 'Failed to update personal information');
+                }
+            },
+            error: function(xhr, status, error) {
+                message('danger', 'An error occurred. Please try again.');
+            }
+        });
+    })
+
+    // update personal location
+    $("#updatePersonalLocationBtn").on('click', function(e) {
+        e.preventDefault();
+
+        let address = $("#address").val();
+        let city = $("#city").val();
+        let region = $("#region").val();
+        let postCode = $("#post-code").val();
+        let nation = $("#nation").val();
+        
+        if (address == '' || city == '' || region == '' || postCode == '' || nation == '') {
+            message('danger', 'Please fill all the required fields');
+            return;
+        }
+
+        $.ajax({
+            url: '{% url "update_profile_location" %}',
+            type: 'POST',
+            data: {
+                'address': address,
+                'city': city,
+                'region': region,
+                'post_code': postCode,
+                'nation': nation,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.process ==='success') {
+                    message('success', response.message);
+                } else if(response.process === 'failed') {
+                    message('danger', response.message || 'Failed to update personal location');
+                }
+            },
+            error: function(xhr, status, error) {
+                message('danger', 'An error occurred. Please try again.');
+            }
+        });
+    });
+    });
+</script>
+{% endblock external_ajax_js %}

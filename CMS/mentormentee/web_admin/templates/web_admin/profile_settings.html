@@ -1,0 +1,116 @@
+{% extends "layout/webadmin_dashboard.html" %}
+{% load static %}
+
+{% block dashboard_title %}
+    - Profile Settings
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container">
+        <h4>Manage your Security Settings</h4>
+    </div>
+
+    <div class="container">
+        <h5 class="mt-4">
+            <i class="fa-solid fa-lock me-2 text-primary"></i> Change your password
+        </h5>
+
+        <div class="border border-2 rounded-2 px-3 py-3  mt-4">
+            <form method="POST" id="password-form">
+                <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                    <div class="mb-3 col-md-6">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control shadow-none" placeholder="Enter your username" id="username" required>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="old-password" class="form-label">Old Password</label>
+                        <input type="text" class="form-control shadow-none" placeholder="Enter your old password" id="old-password" required>
+                    </div>
+                </div>
+                <div class="row d-flex flex-column flex-md-row p-0 rounded-2">
+                    <div class="mb-3 col-md-6">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="text" class="form-control shadow-none" id="new-password" placeholder="Enter your new password" required>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                        <input type="text" class="form-control shadow-none" placeholder="Re-enter your new password" id="confirm-password" required>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary" id="updatePasswordBtn" value="Update">
+            </form>
+        </div>
+    </div>
+{% endblock dashboard_main_section %}
+
+{% block external_ajax_js %}
+<script>
+    $(document).ready(function() {
+        // update password
+        $("#updatePasswordBtn").on('click', function(e) {
+            e.preventDefault();
+
+            let username = $("#username").val();
+            let oldPassword = $("#old-password").val();
+            let newPassword = $("#new-password").val();
+            let confirmPassword = $("#confirm-password").val();
+
+            if (username == '' || oldPassword == '' || newPassword == '' || confirmPassword == '') {
+                message('danger', 'Please fill all the required fields');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                message('danger', 'Password must be at least 8 characters long.');
+                return;
+            }
+
+            if (!(newPassword === confirmPassword)) {
+                message('danger', 'Please enter a valid password.<br>New-Password & Confirm-Password does not match');
+                return;
+            }
+
+            $.ajax({
+                url: '{% url "update_mentor_password" %}',
+                type: 'POST',
+                data: {
+                    'username': username,
+                    'oldPassword': oldPassword,
+                    'newPassword': newPassword,
+                    'confirmPassword': confirmPassword,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.process === 'success') {
+                        message('success', response.message);
+                        $("#password-form").trigger("reset");
+
+                        $("#loginAgainModal").modal("show");
+                    } else if(response.process === 'failed') {
+                        message('danger', response.message || 'Failed to update password.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    message('danger', 'Something went wrong, while updating password. Please try again later.');
+                }
+            });
+        })
+
+        // redirect to the login page
+        $("#loginAgainModalBtn").on('click', function() {
+            $.ajax({
+                url: '{% url "logout_mentor" %}',
+                success: function(response) {
+                    if (response.process == 'logout success') { 
+                        $("#loginAgainModal").modal("hide");
+                        window.location.href = '{% url "login_page" %}';
+                    }
+                },
+                error: function(xhr, status, error) {
+                    message('danger', 'Something went wrong, while logging out. Please try again later.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock external_ajax_js %}

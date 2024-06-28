@@ -1,0 +1,269 @@
+{% extends "layout/webadmin_dashboard.html" %}
+
+{% block dashboard_title %}
+    - Mentee Users
+{% endblock dashboard_title %}
+
+{% block dashboard_main_section %}
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+        <form method="post">
+            <input type="text" class="form-control border-2 shadow-none fs-5" placeholder="Search mentees here...">
+        </form>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded-2">
+
+            <div class="row">
+                <h4 class="text-center">Your Mentees</h4>
+            </div>
+
+            <div class="row">
+                <div class="my-2 d-flex align-items-center justify-content-end">
+                    <button class="btn btn-primary" id="exportMenteeData"><i class="fa-solid fa-download me-2"></i>Export Data</button>
+                </div>
+            </div>
+
+            <div id="menteesOfMentor" class="overflow-x-auto overflow-y-auto" style="height: 345px;">
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+
+        <div class="bg-dark p-2 rounded-2">
+            <div class="row">
+                <h4 class="text-center">Mentees</h4>
+            </div>
+
+            <div id="menteesRecord" class="overflow-x-auto overflow-y-auto" style="height: 345px;">
+            </div>
+
+        </div>
+
+    </div>
+{% endblock dashboard_main_section %}
+
+
+{% block external_ajax_js %}
+<script>
+    $(document).ready(function() {
+    // create table for get unassigned mentees
+    function createTableUMentee(data) {
+        let table = $('<table class="table table-hover table-dark"></table>');
+        
+        // Create table header
+        let headers = [
+            "S.No",
+            "Username",
+            "Roll No",
+            "Branch",
+            "Semester",
+            "Phone",
+            "Show Profile",
+            "Add Mentee",
+        ];
+        let headerRow = $('<tr></tr>');
+        headers.forEach(function(header) {
+            headerRow.append($('<th></th>').text(header));
+        });
+        table.append($('<thead></thead>').append(headerRow));
+    
+        // Create table body
+        let tbody = $('<tbody></tbody>');
+        data.forEach(function(item, index) {
+            let row = $('<tr></tr>');
+            row.append($('<td></td>').text(index+1));
+            row.append($('<td></td>').text(item.username));
+            row.append($('<td></td>').text(item.mentee_profile__roll_no));
+            row.append($('<td></td>').text(item.mentee_profile__branch));
+            row.append($('<td></td>').text(item.mentee_profile__semester));
+            row.append($('<td></td>').text(item.mentee_profile__phone));
+            row.append($('<td></td>').html(`<button class='btn btn-sm btn-primary show-mentee-profile' data-bs-toggle='modal' data-bs-target='#menteeProfile' data-id=${item.id}>Show</button>`));
+            row.append($('<td></td>').html(`<button class='btn btn-sm btn-success add-mentee' data-id=${item.id}>Add</button>`));
+            tbody.append(row);
+        });
+    
+        table.append(tbody);
+    
+        return table;
+    }
+
+    // create table for get mentees of mentor
+    function createTableMMentee(data) {
+        let table = $('<table class="table table-hover table-dark"></table>');
+        
+        // Create table header
+        let headers = [
+            "S.No",
+            "Username",
+            "Roll No",
+            "Branch",
+            "Semester",
+            "Phone",
+            "Show Profile",
+            "Remove Mentee",
+        ];
+        let headerRow = $('<tr></tr>');
+        headers.forEach(function(header) {
+            headerRow.append($('<th></th>').text(header));
+        });
+        table.append($('<thead></thead>').append(headerRow));
+    
+        // Create table body
+        let tbody = $('<tbody></tbody>');
+        data.forEach(function(item, index) {
+            let row = $('<tr></tr>');
+            //headers.forEach(function(row_item) {
+            //});
+            row.append($('<td></td>').text(index+1));
+            row.append($('<td></td>').text(item.username));
+            row.append($('<td></td>').text(item.roll_no));
+            row.append($('<td></td>').text(item.branch));
+            row.append($('<td></td>').text(item.semester));
+            row.append($('<td></td>').text(item.phone));
+            row.append($('<td></td>').html(`<button class='btn btn-sm btn-primary show-mentee-profile' data-bs-toggle='modal' data-bs-target='#menteeProfile' data-id=${item.id}>Show</button>`));
+            row.append($('<td></td>').html(`<button class='btn btn-sm btn-danger remove-mentee' data-id=${item.id}>Remove</button>`));
+            tbody.append(row);
+        });
+    
+        table.append(tbody);
+    
+        return table;
+    }
+
+    // get mentees of mentor
+    function getMentees () {
+        $.ajax({
+            url: "{% url 'get_mentees_of_mentor' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+
+            success: function(response){
+                let table = createTableMMentee(response.mentees);
+                $('#menteesOfMentor').empty().append(table); 
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    }
+    getMentees();
+
+    // get unassigned mentees
+    function getUnassignedMentees () {
+        $.ajax({
+            url: "{% url 'get_unassigned_mentees' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+
+            success: function(response){
+                let table = createTableUMentee(response.mentees);
+                $('#menteesRecord').empty().append(table); 
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    }
+    getUnassignedMentees();
+
+    // show mentee profile
+    $(document).on('click', '.show-mentee-profile', function() {
+        let menteeId = $(this).data("id");
+
+        $.ajax({
+            url: "{% url 'get_mentee_profile' %}",
+            type: "POST",
+            data: {
+                menteeId: menteeId,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+
+                let responseData = response.data;
+
+                $("#name").text(responseData.username);
+                $("#rollNo").text(responseData.roll_no);
+                $("#course").text(responseData.course);
+                $("#branch").text(responseData.branch);
+                $("#semester").text(responseData.semester);
+                $("#mentor").text(responseData.mentor);
+                $("#phone").text(responseData.phone);
+                $("#email").text(responseData.email);
+                $("#fatherName").text(responseData.father_name);
+                $("#fatherPhone").text(responseData.father_phone);
+                $("#fatherProfession").text(responseData.father_profession);
+                $("#address").text(responseData.address);
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    });
+
+    // add new mentee
+    $(document).on('click', '.add-mentee', function() {
+        let menteeId = $(this).data("id");
+
+        $.ajax({
+            url: "{% url 'add_mentee' %}",
+            type: "POST",
+            data: {
+                menteeId: menteeId,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+                if (response.process == "success") {
+                    $(this).fadeOut('slow');
+                    getMentees();
+                    getUnassignedMentees();
+                    message("success", response.message);
+                }
+                else {
+                    message("danger", response.message);
+                }
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    });
+
+    // remove mentee
+    $(document).on('click', '.remove-mentee', function() {
+        let menteeId = $(this).data("id");
+        $.ajax({
+            url: "{% url 'remove_mentee' %}",
+            type: "POST",
+            data: {
+                menteeId: menteeId,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+                if (response.process == "success") {
+                    $(this).fadeOut('slow');
+                    getMentees();
+                    getUnassignedMentees();
+                    message("success", response.message);
+                }
+                else {
+                    message("danger", response.message);
+                }
+            },
+            error: function(response) {
+                message("danger", "Something went wrong, please try again later");
+            }
+        });
+    });
+
+    });
+</script>
+{% endblock external_ajax_js %}
