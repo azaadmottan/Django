@@ -91,12 +91,32 @@
                 <label for="description" class="form-label fs-5 fw-medium">Description</label>
                 <textarea type="text" id="description" class="form-control border-2 shadow-none fs-5" placeholder="Enter description here..."></textarea>
             </div>
+            
+            <div class="row d-flex flex-column flex-md-row p-2 rounded-2">
+                <select class="form-select border-2 shadow-none fs-5" id="notification-type">
+                    <option value="none" selected>Select user type to publish notification...</option>
+                    <option value="public">Public</option>
+                    <option value="web_admin">Web Admin</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="mentee">Mentee</option>
+                </select>
+            </div>
 
             <div>
                 <input type="submit" value="Add Notification" id="addNotification" class="btn btn-primary mt-4 fw-medium">
             </div>
         </form>
         </div>
+    </div>
+
+    <div class="container bg-secondary mt-4 rounded-2 p-4">
+        <div class="row p-2 bg-dark text-center rounded-1">
+            <h4>Current Notification</h4>
+        </div>
+
+        <div id="currentNotifications" class="mt-2 p-2 bg-dark rounded-2 overflow-x-auto overflow-y-auto" style="height: 600px">
+        </div>
+
     </div>
 {% endblock dashboard_main_section %}
 
@@ -114,13 +134,38 @@
         function getNotifications () {
                 
             $.ajax({
-                url: "#",
+                url: "{% url 'web_admin_get_notifications' %}",
                 type: "POST",
                 data: { csrfmiddlewaretoken: "{{ csrf_token }}" },
 
                 success: function(response){
+                    if (response.process == 'success') {
+                        let notifications = response.data;
+                        $("#currentNotifications").empty();
+                        notifications.forEach(notification => {
+                            let notificationHTML = `
+                                <div class=' mt-2 bg-body-tertiary border rounded-2'>
+                                    <div class='bg-body-secondary rounded-2 px-2 mb-2 d-flex align-items-center justify-content-between'>
+                                        <h4 class='fst-italic w-75'>
+                                            ${notification.title}
+                                        </h4>
+                                        <div>
+                                            <span class='me-2'>${new Date(notification.created_at).toLocaleString()}</span>
+                                        </div>
+                                        <div>
+                                            <button class='btn btn-sm btn-danger fw-semibold removeNotificationBtn' data-notificationid=${notification.id}>Remove</button>
+                                        </div>
+                                    </div>
+                                    <div class='bg-dark-subtle fs-6 px-2 py-3 rounded-2 d-flex align-items-center'>
+                                        <span class="badge text-bg-primary fst-italic">${notification.user_notification_type.toUpperCase()}</span>&nbsp;
+                                        ${notification.description}
+                                    </div>
+                                </div>
+                            `;
+                            $("#currentNotifications").append(notificationHTML);
+                        });
 
-                    $("#currentNotifications").html(response);
+                    }
                 }
             });
         }
@@ -133,30 +178,63 @@
 
             let title = $("#title").val();
             let description = $("#description").val();
+            let notificationType = $("#notification-type").find(':selected').val();
 
-            if (title === "" || description === "") {
-                message("error", "All fields are required");
+            if (title === "" || description === "" || notificationType === "none") {
+                message("danger", "All fields are required");
                 return;
             }
             else {
 
                 $.ajax({
-                    url : "#",
+                    url : "{% url 'web_admin_add_notification' %}",
                     type : "POST",
-                    data : { title: title, description: description, csrfmiddlewaretoken: "{{csrf_token}}" },
-                    
+                    data : {
+                        title: title, description: description,
+                        notificationType: notificationType,
+                        csrfmiddlewaretoken: "{{csrf_token}}"
+                    },
                     success : function(response){
-                        if (response == "success") {
+                        if (response.process == "success") {
                             $("#notificationForm").trigger("reset");
                             getNotifications();
-                            message("success", "Notification added successfully");
+                            message("success", response.message);
                         }
-                        else  {
-                            message("error", "Something went wrong");
+                        else if (response.process == "failed") {
+                            message("danger", response.message);
                         }
+                    },
+                    error : function(response){
+                        message("danger", "Something went wrong, please try again later...");
                     }
                 });
             }
+        });
+
+        // remove notification
+        $(document).on("click", ".removeNotificationBtn", function() {
+            let notificationId = $(this).data("notificationid");
+
+            $.ajax({
+                url : "{% url 'web_admin_remove_notification' %}",
+                type : "POST",
+                data : {
+                    notificationId: notificationId,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success : function(response){
+                    if (response.process == "success") {
+                        getNotifications();
+                        message("success", response.message);
+                    }
+                    else if (response.process == "failed") {
+                        message("danger", response.message);
+                    }
+                },
+                error : function(response){
+                    message("danger", "Something went wrong, please try again later...");
+                }
+            });
         });
 
         // get web-admin profile data

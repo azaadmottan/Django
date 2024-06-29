@@ -133,15 +133,12 @@
     // get user profile picture
     function getProfilePicture() {
         $.ajax({
-            url: "{% url 'get_profile_picture' %}",
+            url: "{% url 'get_web_admin_profile_picture' %}",
             type: "GET",
             success: function(response) {
                 if (response.process == 'success') {
                     $profileImage.attr('src', response.profile_picture);
                 }
-                //else if (response.process == 'failed') {
-                //    message("warning", response.message);
-                //}
             },
             error: function(response) {
                 message("danger", "Something went wrong, please try again later");
@@ -171,7 +168,7 @@
             formData.append('csrfmiddlewaretoken', "{{ csrf_token }}");
 
             $.ajax({
-                url: "{% url 'update_profile_picture' %}",
+                url: "{% url 'update_web_admin_profile_picture' %}",
                 type: "POST",
                 data: formData,
                 processData: false,
@@ -195,27 +192,27 @@
     // get mentor profile data
     function getMentorProfileData() {
         $.ajax({
-            url: "{% url 'get_profile_data' %}",
+            url: "{% url 'get_web_admin_profile_data' %}",
             type: "POST",
             data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
 
             success: function(response) {
                 if (response.process === 'success') {
                     // last profile update
-                    $('#last-update').text(new Date(response.data.mentor_profile.updated_at));
+                    $('#last-update').text(new Date(response.data.web_admin_profile.updated_at));
 
                     // perosonal info
                     $('#first-name').val(response.data.user.first_name);
                     $('#last-name').val(response.data.user.last_name);
-                    $('#dob').val(response.data.mentor_profile.dob);
-                    $('#phone-number').val(response.data.mentor_profile.phone);
+                    $('#dob').val(response.data.web_admin_profile.dob);
+                    $('#phone-number').val(response.data.web_admin_profile.phone);
 
                     // perosonal location
-                    $('#address').val(response.data.mentor_profile.address);
-                    $('#city').val(response.data.mentor_profile.city);
-                    $('#region').val(response.data.mentor_profile.region);
-                    $('#post-code').val(response.data.mentor_profile.postal_code);
-                    $('#nation').val(response.data.mentor_profile.nationality);
+                    $('#address').val(response.data.web_admin_profile.address);
+                    $('#city').val(response.data.web_admin_profile.city);
+                    $('#region').val(response.data.web_admin_profile.region);
+                    $('#post-code').val(response.data.web_admin_profile.postal_code);
+                    $('#nation').val(response.data.web_admin_profile.nationality);
                 }
             },
             error: function(response) {
@@ -266,7 +263,7 @@
         }
 
         $.ajax({
-            url: '{% url 'update_profile_info' %}',
+            url: '{% url "update_web_admin_profile_info" %}',
             type: 'POST',
             data: {
                 'first_name': firstName,
@@ -304,7 +301,7 @@
         }
 
         $.ajax({
-            url: '{% url "update_profile_location" %}',
+            url: '{% url "update_web_admin_profile_location" %}',
             type: 'POST',
             data: {
                 'address': address,

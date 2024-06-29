@@ -80,3 +80,19 @@ class MenteeQuery(models.Model):
 
     def __str__(self):
         return f"{self.mentee_name} (mentee) | {self.mentor_name} (mentor) | {self.subject} (subject)"
+
+class Notification(models.Model):
+    USER_TYPE_NOTIFICATION = [
+        ('public', 'Public'),
+        ('web_admin', 'Web Admin'),
+        ('mentor', 'Mentor'),
+        ('mentee', 'Mentee')
+    ]
+    title = models.CharField(max_length=500)
+    description = models.TextField(max_length=2000)
+    user_notification_type = models.CharField(max_length=255, choices=USER_TYPE_NOTIFICATION, default='public')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} | {self.user_notification_type}"

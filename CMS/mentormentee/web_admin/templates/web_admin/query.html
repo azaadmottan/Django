@@ -28,7 +28,7 @@
 {% block external_common_ajax_js %}
     function getQueries() {
         $.ajax({
-            url : "{% url 'get_mentee_queries' %}",
+            url : "{% url 'web_admin_mentee_queries' %}",
             type : "POST",
             data : {csrfmiddlewaretoken: "{{ csrf_token }}"},
             
@@ -69,11 +69,16 @@
                                                     Description: ${item.description}
                                                 </div>
 
+                                                <div class="my-3 d-flex align-items-center justify-content-end">
+                                                    <input type="button" class="btn btn-sm btn-danger remove-query" data-id="${item.id}" value="Remove Query">
+                                                </div>
+
                                                 <select class="form-select mb-1 shadow-none currentStatus" data-queryid="${item.id}" aria-label="Query Status">
                                                     <option value="pending" ${item.status == 'pending' ? 'selected' : ''}>Pending</option>
                                                     <option value="ongoing" ${item.status == 'ongoing' ? 'selected' : ''}>Ongoing / Inprogress</option>
                                                     <option value="completed" ${item.status == 'completed' ? 'selected' : ''}>Completed</option>
                                                 </select>
+
                                             </div>
                                         </div>
                                     </div>
@@ -130,5 +135,31 @@
                 message("danger", "Something went wrong, please try again later");
             }
         });
+    });
+
+    // remove query
+    $(document).on("click", ".remove-query", function () {
+        let queryId = $(this).data("id");
+        $.ajax({
+            url: "{% url 'web_admin_delete_query' %}",
+            type: "POST",
+            data: { queryId: queryId, csrfmiddlewaretoken: "{{ csrf_token }}" },
+            dataType: "text",
+            success: function(response){
+                resp = JSON.parse(response);
+                if (resp.process == "success") {
+                    getQueries();
+                    getMessageNotifications();
+                    message("success", resp.message);
+                }
+                else if (resp.process == "failed") {
+                    message("danger", resp.message);
+                }
+            },
+            error: function(response) {
+                message("danger", "Something went wrong, please try again later");
+            }
+        });
+
     });
 {% endblock external_common_ajax_js %}

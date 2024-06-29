@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WebAdminProfile, MentorProfile, MenteeProfile, MenteeQuery
+from .models import WebAdminProfile, MentorProfile, MenteeProfile, MenteeQuery, Notification
 
 # Register your models here.
 
@@ -15,7 +15,11 @@ class MenteeProfileAdmin(admin.ModelAdmin):
 class MenteeQueryAdmin(admin.ModelAdmin):
     list_display = ('mentee_name', 'mentor_name', 'subject', 'created_at', 'updated_at')
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user_notification_type', 'created_at', 'updated_at')
+
 admin.site.register(WebAdminProfile, WebAdminProfileAdmin)
 admin.site.register(MentorProfile, MentorProfileAdmin)
 admin.site.register(MenteeProfile, MenteeProfileAdmin)
 admin.site.register(MenteeQuery, MenteeQueryAdmin)
+admin.site.register(Notification, NotificationAdmin)

@@ -71,7 +71,7 @@
             }
 
             $.ajax({
-                url: '{% url "update_mentor_password" %}',
+                url: '{% url "update_web_admin_password" %}',
                 type: 'POST',
                 data: {
                     'username': username,
@@ -99,7 +99,7 @@
         // redirect to the login page
         $("#loginAgainModalBtn").on('click', function() {
             $.ajax({
-                url: '{% url "logout_mentor" %}',
+                url: '{% url "logout_web_admin" %}',
                 success: function(response) {
                     if (response.process == 'logout success') { 
                         $("#loginAgainModal").modal("hide");

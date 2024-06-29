@@ -143,55 +143,14 @@
                     <li class="nav-item dropdown dropdown-center">
                         <span class="nav-link" data-bs-toggle="dropdown" role="button" >
                         <i class="far fa-comments"></i>
-                        <span class="badge text-bg-danger">3</span>
+                        <span class="badge text-bg-danger" id="total-messages">0</span>
                         </span>
-                        <div class="dropdown-menu dropdown-menu-lg dropdown-center">
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                Brad Diesel
-                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">Call me whenever you can...</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+
+                        <div class="dropdown-menu dropdown-menu-sm dropdown-center">
+                            <div id="message-container" class="overflow-y-auto" style="height: 200px;">
+                                
                             </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                John Pierce
-                                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">I got your message bro</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <!-- Message Start -->
-                            <div class="media">
-                            <div class="media-body">
-                                <h6 class="dropdown-item-title">
-                                Nora Silvester
-                                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                                </h6>
-                                <p class="text-sm">The subject goes here</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                            </div>
-                            <!-- Message End -->
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                            <a href="{% url "web_admin_queries" %}" class="dropdown-item dropdown-footer">See All Messages</a>
                         </div>
                     </li>
 
@@ -236,18 +195,16 @@
                             <span class="float-right text-muted text-sm">3 mins</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
+                        <a href="{% url 'web_admin_profile_settings' %}" class="dropdown-item">
+                            <i class="fa-solid fa-address-card me-2"></i>User Profile
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
+                        <a href="{% url 'web_admin_profile_security_settings' %}" class="dropdown-item">
+                            <i class="fa-solid fa-sliders me-2"></i>Profile Settings
                         </a>
                         <div class="dropdown-divider"></div>
                         <span class="dropdown-item dropdown-footer pt-2" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                            <i class="fa-solid fa-right-from-bracket me-3"></i> Logout
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                         </span>
                         </div>
                     </li>
@@ -394,10 +351,17 @@
         </div>
     </div>
 
+    
+    {% comment %} toast component {% endcomment %}
+    {% include "components/toast.html" %}
     {% comment %} logoutModal {% endcomment %}
     {% include "components/modal.html" %}
+    {% comment %} loginAgainModal {% endcomment %}
+    {% include "components/static_modal.html" %}
     {% comment %} mentorProfileModal {% endcomment %}
     {% include "components/web_admin/mentor_profile_modal.html" %}
+    {% comment %} menteeProfileModal {% endcomment %}
+    {% include "components/web_admin/mentee_profile_modal.html" %}
     
     {% comment %} external js {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -442,6 +406,48 @@
                     }
                 })
             });
+
+            // get message Notifications
+            function getMessageNotifications() {
+                $.ajax({
+                    url : "{% url 'web_admin_mentee_queries' %}",
+                    type : "POST",
+                    data : {csrfmiddlewaretoken: "{{ csrf_token }}"},
+                    
+                    success : function(response){
+                        if (response.process == "success") {
+                            let messages = $("#message-container");
+                            messages.empty();
+                            let countMsg = 0;
+                            response.data.forEach(item => {
+                                if (item.status == "pending"){
+                                    let message = `
+                                    <span class="dropdown-item px-3 py-1">
+                                        <div>
+                                            <h6 class="dropdown-item-title">
+                                            ${item.mentee_name__username}
+                                            <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                            </h6>
+                                            <p class="text-sm">${item.subject}</p>
+                                            <p class="text-sm" style="font-size: 12px;"><i class="far fa-clock me-2"></i>${new Date(item.created_at).toLocaleString()}</p>
+                                        </div>
+                                    </span>
+                                    <div class="dropdown-divider"></div>
+                                    `;
+
+                                    messages.append(message);
+                                    countMsg++;
+                                }
+                            });
+                            $("#total-messages").text(countMsg);
+                        }
+                    },
+                    error: function(response) {
+                        message("danger", "Something went wrong, please try again later");
+                    }
+                });
+            }
+            getMessageNotifications();
 
             {% block external_common_ajax_js %}
             {% endblock external_common_ajax_js %}
