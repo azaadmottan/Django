@@ -1,7 +1,10 @@
 {% extends "layout/webadmin_dashboard.html" %}
 
 {% block dashboard_title %}
-    - Mentor Users
+    - Mentor profile 
+    {% if request.path %}
+        (@ {{mentor.username}})
+    {% endif %}
 {% endblock dashboard_title %}
 
 {% block dashboard_main_section %}
@@ -16,7 +19,7 @@
         <div class="bg-dark p-2 rounded-2">
 
             <div class="row">
-                <h4 class="text-center">Mentor Profile</h4>
+                <h4 class="text-center">Mentees of Mentor</h4>
             </div>
 
             <div class="row">
@@ -26,6 +29,40 @@
             </div>
 
             <div id="mentors-data" class="overflow-x-auto overflow-y-auto" style="height: 345px;">
+                <table class="table table-hover table-dark">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Username</th>
+                            <th>Roll no</th>
+                            <th>Course</th>
+                            <th>Branch</th>
+                            <th>Semester</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if mentees %}
+                        {% for mentee in mentees %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ mentee.username }}</td>
+                                <td>{{ mentee.roll_no }}</td>
+                                <td>{{ mentee.course }}</td>
+                                <td>{{ mentee.branch }}</td>
+                                <td>{{ mentee.semester }}</td>
+                                <td>{{ mentee.phone }}</td>
+                                <td>{{ mentee.address }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">No mentee found.</td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
             </div>
 
         </div>
@@ -37,68 +74,6 @@
 {% block external_ajax_js %}
 <script>
     $(document).ready(function() {
-    // create table for get mentees of mentor
-    function createTableMentor(data) {
-        let table = $('<table class="table table-hover table-dark"></table>');
-        
-        // Create table header
-        let headers = [
-            "S.No",
-            "Username",
-            "Full name",
-            "Employee id",
-            "Department",
-            "Phone",
-            "Created date",
-            "Show Profile",
-        ];
-        let headerRow = $('<tr></tr>');
-        headers.forEach(function(header) {
-            headerRow.append($('<th></th>').text(header));
-        });
-        table.append($('<thead></thead>').append(headerRow));
-    
-        // Create table body
-        let tbody = $('<tbody></tbody>');
-        data.forEach(function(item, index) {
-            let mentorProfileUrl = "{% url 'web_admin_show_mentor_profile' 'USERNAME_PLACEHOLDER' %}".replace('USERNAME_PLACEHOLDER', item.username);
-
-            let row = $('<tr></tr>');
-            row.append($('<td></td>').text(index+1));
-            row.append($('<td></td>').html(`<a href='${mentorProfileUrl}'>${item.username}</a>`));
-            row.append($('<td></td>').text(item.first_name + ' ' + item.last_name));
-            row.append($('<td></td>').text(item.mentor_profile__emp_id));
-            row.append($('<td></td>').text(item.mentor_profile__department));
-            row.append($('<td></td>').text(item.mentor_profile__phone));
-            row.append($('<td></td>').text(new Date(item.mentor_profile__created_at).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})));
-            row.append($('<td></td>').html(`<button class='btn btn-sm btn-primary show-mentor-profile' data-bs-toggle='modal' data-bs-target='#mentorProfile' data-id=${item.id}>Show</button>`));
-            tbody.append(row);
-        });
-    
-        table.append(tbody);
-    
-        return table;
-    }
-
-    // get mentees of mentor
-    function getMentors () {
-        $.ajax({
-            url: "{% url 'web_admin_get_mentors' %}",
-            type: "POST",
-            data: {
-                csrfmiddlewaretoken: "{{ csrf_token }}"
-            },
-            success: function(response){
-                let table = createTableMentor (response.data);
-                $('#mentors-data').empty().append(table); 
-            },
-            error: function(response){
-                message('danger', 'Something went wrong, while fetching mentors.');
-            }
-        });
-    }
-    getMentors();
-
     // show mentor profile
     $(document).on('click', '.show-mentor-profile', function() {
         let mentorId = $(this).data("id");

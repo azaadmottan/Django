@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -483,6 +483,7 @@ def get_mentee_profile(request):
             'process': 'failed'
         })
 
+@login_required(login_url='login_page')
 @web_admin_required
 def queries(request):
     return render(request, 'web_admin/query.html')
@@ -714,5 +715,43 @@ def logout_user(request):
         return JsonResponse({
             'status': 400,
             'message': 'Failed to logout',
+            'process': 'failed'
+        })
+
+@login_required(login_url='login_page')
+@web_admin_required
+def mentor_profile(request, username):
+    if not username:
+        return JsonResponse({
+            'status': 400,
+            'message': 'Username is required',
+            'process': 'failed'
+        })
+    if request.method == 'GET':
+
+        mentor = MentorProfile.objects.get(username=User.objects.get(username=username))
+
+        mentees = MenteeProfile.objects.filter(mentor=mentor)
+
+        mentees_data = []
+        for mentee in mentees:
+            mentees_data.append({
+                'id': mentee.username.id,
+                'profile_id': mentee.id,
+                'username': mentee.username.username,
+                'roll_no': mentee.roll_no,
+                'course': mentee.course,
+                'branch': mentee.branch,
+                'semester': mentee.semester,
+                'phone': mentee.phone,
+                'address': mentee.address,
+                'mentor_username': mentor.username.username,
+            })
+
+        return render(request, 'web_admin/mentor_profile.html', {'mentor': mentor, 'mentees': mentees_data})
+    else:
+        return JsonResponse({
+            'status': 405,
+            'message': 'Method not allowed',
             'process': 'failed'
         })

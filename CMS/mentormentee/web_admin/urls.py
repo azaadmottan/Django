@@ -26,4 +26,6 @@ urlpatterns = [
     path('get-notifications/', views.get_notifications, name='web_admin_get_notifications'),
     path('remove-notification/', views.remove_notification, name='web_admin_remove_notification'),
     path('logout_web_admin/', views.logout_user, name='logout_web_admin'),
+
+    path('mentor-profile/<str:username>/', views.mentor_profile, name='web_admin_show_mentor_profile'),
 ]
